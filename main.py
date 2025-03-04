@@ -151,8 +151,8 @@ class JellyFieldState:
                                 for color in collisionColors:
                                     self.board[i][j].erase(color)
                                     self.board[ni][nj].erase(color)
-                                    self.board[i][j].expand()
-                                    self.board[ni][nj].expand()
+                                self.board[i][j].expand()
+                                self.board[ni][nj].expand()
 
     def __eq__(self, other):
         return (
