@@ -23,8 +23,13 @@ class Jelly:
                         if 0 <= ni < 2 and 0 <= nj < 2:
                             if self.array[ni][nj] == 'E':
                                 self.array[ni][nj] = self.array[i][j]
+                                
 
-                   
+    def erase(self, color):
+        for i in range(2):
+            for j in range(2):
+                if self.array[i][j] == color:
+                    self.array[i][j] = 'E'
     def __str__(self):
         return str(self.array)
 
@@ -102,6 +107,52 @@ class JellyFieldState:
                     self.next_jellies.append(Jelly(jelly_array))
                     i += 2
                 i += 1
+    def checkCollision(self, jelly1, jelly2, direction):
+        if jelly1.type == "na" or jelly2.type == "na":
+            return None
+
+        collisionColors = []
+        if direction == 'up':
+            pairs = [(jelly1.array[0][0], jelly2.array[1][0]), (jelly1.array[0][1], jelly2.array[1][1])]
+        elif direction == 'down':
+            pairs = [(jelly1.array[1][0], jelly2.array[0][0]), (jelly1.array[1][1], jelly2.array[0][1])]
+        elif direction == 'left':
+            pairs = [(jelly1.array[0][0], jelly2.array[0][1]), (jelly1.array[1][0], jelly2.array[1][1])]
+        elif direction == 'right':
+            pairs = [(jelly1.array[0][1], jelly2.array[0][0]), (jelly1.array[1][1], jelly2.array[1][0])]
+        else:
+            raise ValueError("Invalid direction")
+
+        for color1, color2 in pairs:
+            if color1 == color2:
+                collisionColors.append(color1)
+
+        return collisionColors if collisionColors else None
+    def collapse(self):
+        changes = True
+        while changes:
+            changes = False
+            for i in range(self.c1):
+                for j in range(self.c2):
+                    neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
+                    for ni, nj in neighbors:
+                        if 0 <= ni < self.c1 and 0 <= nj < self.c2:
+                            if ni == i - 1:
+                                direction = 'up'
+                            elif ni == i + 1:
+                                direction = 'down'
+                            elif nj == j - 1:
+                                direction = 'left'
+                            elif nj == j + 1:
+                                direction = 'right'
+                            collisionColors = self.checkCollision(self.board[i][j], self.board[ni][nj], direction)
+                            if collisionColors:
+                                changes = True
+                                for color in collisionColors:
+                                    self.board[i][j].erase(color)
+                                    self.board[ni][nj].erase(color)
+                                    self.board[i][j].expand()
+                                    self.board[ni][nj].expand()
 
     def __eq__(self, other):
         return (
@@ -123,9 +174,15 @@ jelly1.expand()
 print(jelly1)
 
 jellyState = JellyFieldState("init.txt")
-print(jellyState)
-print("done")
-for i in range(len(jellyState.board)):
-    for j in range(len(jellyState.board[i])):
-        print( " i is " + str(i) + " j is " + str(j))
-        print(jellyState.board[i][j])
+
+print("Initial Board State:")
+for i, row in enumerate(jellyState.board):
+    for j, jelly in enumerate(row):
+        print(f"Position ({i}, {j}): {jelly}")
+
+jellyState.collapse()
+
+print("\nBoard State After Collapse:")
+for i, row in enumerate(jellyState.board):
+    for j, jelly in enumerate(row):
+        print(f"Position ({i}, {j}): {jelly}")
