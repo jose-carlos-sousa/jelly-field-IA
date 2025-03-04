@@ -46,6 +46,7 @@ class JellyFieldState:
             self.board = []
             self.next_jellies = []
             self.goal = {}
+            self.colors = {}
 
     def load_from_file(self, file):
         with open(file, 'r') as f:
@@ -114,7 +115,7 @@ class JellyFieldState:
         return hash((tuple(map(tuple, self.board)), tuple(self.next_jellies), frozenset(self.goal.items())))
 
     def __str__(self):
-        return f"Board: {self.board}, Next Jellies: {self.next_jellies}, Goal: {self.goal}"
+        return f"Colors {self.colors} Board: {self.board}, Next Jellies: {self.next_jellies}, Goal: {self.goal}"
 
 # Define a 2x2 Jelly (Color 1)
 jelly1 = Jelly([['E', 'A'], ['E', 'B']], "normal")
@@ -122,6 +123,7 @@ jelly1.expand()
 print(jelly1)
 
 jellyState = JellyFieldState("init.txt")
+print(jellyState)
 print("done")
 for i in range(len(jellyState.board)):
     for j in range(len(jellyState.board[i])):
