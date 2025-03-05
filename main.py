@@ -1,3 +1,9 @@
+import sys, pygame, time
+
+pygame.init()
+size = width, height = 1280, 720
+screen = pygame.display.set_mode(size)
+clock = pygame.time.Clock()
 
 #For convertion E means empty space, N means Non playable space
 class Jelly:
@@ -154,6 +160,18 @@ class JellyFieldState:
                                 self.board[i][j].expand()
                                 self.board[ni][nj].expand()
 
+    def display(self):
+        for i in range(self.c1):
+            for j in range(self.c2):
+                square = self.board[i][j].array
+                left = j * (width // self.c2)
+                top = i * (height // self.c1)
+                for r in range(len(square)):
+                    for c in range(len(square[r])):
+                        rect = pygame.Rect(left + c * (width // (self.c2 * 2)), top + r * (height // (self.c1 * 2)), width // (self.c2 * 2), height // (self.c1 * 2)) 
+                        pygame.draw.rect(screen, self.colors[square[r][c]], rect)
+
+
     def __eq__(self, other):
         return (
             isinstance(other, JellyFieldState)
@@ -175,14 +193,13 @@ print(jelly1)
 
 jellyState = JellyFieldState("init.txt")
 
-print("Initial Board State:")
-for i, row in enumerate(jellyState.board):
-    for j, jelly in enumerate(row):
-        print(f"Position ({i}, {j}): {jelly}")
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: sys.exit()
 
-jellyState.collapse()
-
-print("\nBoard State After Collapse:")
-for i, row in enumerate(jellyState.board):
-    for j, jelly in enumerate(row):
-        print(f"Position ({i}, {j}): {jelly}")
+    screen.fill((0, 0, 0))
+    jellyState.display()
+    time.sleep(2)
+    jellyState.collapse()
+    pygame.display.flip()
+    clock.tick(60)
