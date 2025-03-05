@@ -1,0 +1,22 @@
+//DEF COLORS
+R = (255,0,0)
+G = (0,255,0)
+B = (0,0,255)
+//DEF GOAL
+R = 5
+G = 2
+B = 1
+//DEF BOARD
+RRRR
+GGBB
+RRGG
+GGGG
+//DEF SEQ
+GG
+BB
+
+EE
+BB
+
+RR
+GG
