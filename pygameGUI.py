@@ -11,6 +11,7 @@ class pygameGUI:
         self.current_screen = "main_menu"
         self.font = pygame.font.Font(None, 48)
         self.buttons = {}
+        self.clock = pygame.time.Clock()
 
     def display(self, state):
         """
@@ -56,8 +57,14 @@ class pygameGUI:
                 elif button_text == "Leaderboard":
                     self.current_screen = "leaderboard_screen"
                 elif button_text == "Quit":
-                    pygame.quit()
-                    exit()
+                    self.quit()
+    
+    def handle_game_click(self, pos):
+        """Handles clicks on game buttons."""
+        for button_text, rect in self.buttons.items():
+            if rect.collidepoint(pos):
+                if button_text == "Main Menu":
+                    self.current_screen = "main_menu"
 
     def display_defeat_screen(self):
         """Displays the defeat screen."""
@@ -82,12 +89,12 @@ class pygameGUI:
         self.buttons["Main Menu"] = menu_button_rect
         
         # Draw score (top right)
-        score_text = self.font.render(f"Score: {state['score']}", True, (255, 255, 255))
+        score_text = self.font.render(f"Score: {state.score}", True, (255, 255, 255))
         score_rect = score_text.get_rect(topright=(self.screen.get_width() - 10, 10))
         self.screen.blit(score_text, score_rect)
         
         # Draw board grid
-        board = state['board']
+        board = state.board
         rows, cols = len(board), len(board[0])
         cell_size = 50
         board_x = (self.screen.get_width() - cols * cell_size) // 2
@@ -95,10 +102,16 @@ class pygameGUI:
         
         for row in range(rows):
             for col in range(cols):
-                cell_color = (255, 0, 0) if board[row][col] == 1 else (0, 0, 255)
-                cell_rect = pygame.Rect(board_x + col * cell_size, board_y + row * cell_size, cell_size, cell_size)
-                pygame.draw.rect(self.screen, cell_color, cell_rect)
-                pygame.draw.rect(self.screen, (255, 255, 255), cell_rect, 2)
+                square = state.board[row][col].array
+                srows, scols = len(square), len(square[0])
+                for square_row in range(srows):
+                    for square_column in range(scols):
+                        cell_color = state.colors[square[square_row][square_column]]
+                        square_width, square_height = cell_size / scols, cell_size / srows
+                        cell_rect = pygame.Rect(board_x + col * cell_size + square_column * square_width,
+                         board_y + row * cell_size + square_height * square_row, square_width, square_height)
+                        pygame.draw.rect(self.screen, cell_color, cell_rect)
+                        pygame.draw.rect(self.screen, (255, 255, 255), cell_rect, 2)
                 
         pygame.display.flip()
 
@@ -108,24 +121,19 @@ class pygameGUI:
         """
         pass
 
-    def main_loop(self):
-            """Main loop to display the current screen and handle events."""
-            running = True
-            clock = pygame.time.Clock()
-            state = {'score': 10, 'board': [[0, 1], [0, 1]]}  # Game state placeholder
-            
-            while running:
-                for event in pygame.event.get():
+    def handle_events(self):
+        for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        running = False
+                        self.quit()
                     elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         if self.current_screen == "main_menu":
                             self.handle_main_menu_click(event.pos)
-                
-                self.display(state)
-                clock.tick(30)
-            
-            pygame.quit()
+                        elif self.current_screen == "game_screen":
+                            self.handle_game_click(event.pos)
 
-display = pygameGUI()
-display.main_loop()
+    def tick(self, fps):
+        self.clock.tick(fps)
+
+    def quit(self):
+        pygame.quit()
+        exit()

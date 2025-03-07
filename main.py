@@ -1,9 +1,4 @@
-import sys, pygame, time
-
-pygame.init()
-size = width, height = 1280, 720
-screen = pygame.display.set_mode(size)
-clock = pygame.time.Clock()
+import pygameGUI, time
 
 #For convertion E means empty space, N means Non playable space
 class Jelly:
@@ -58,6 +53,7 @@ class JellyFieldState:
             self.next_jellies = []
             self.goal = {}
             self.colors = {}
+        self.score = 0
 
     def load_from_file(self, file):
         with open(file, 'r') as f:
@@ -160,18 +156,6 @@ class JellyFieldState:
                                 self.board[i][j].expand()
                                 self.board[ni][nj].expand()
 
-    def display(self):
-        for i in range(self.c1):
-            for j in range(self.c2):
-                square = self.board[i][j].array
-                left = j * (width // self.c2)
-                top = i * (height // self.c1)
-                for r in range(len(square)):
-                    for c in range(len(square[r])):
-                        rect = pygame.Rect(left + c * (width // (self.c2 * 2)), top + r * (height // (self.c1 * 2)), width // (self.c2 * 2), height // (self.c1 * 2)) 
-                        pygame.draw.rect(screen, self.colors[square[r][c]], rect)
-
-
     def __eq__(self, other):
         return (
             isinstance(other, JellyFieldState)
@@ -192,14 +176,12 @@ jelly1.expand()
 print(jelly1)
 
 jellyState = JellyFieldState("init.txt")
+gui = pygameGUI.pygameGUI()
 
 while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: sys.exit()
-
-    screen.fill((0, 0, 0))
-    jellyState.display()
-    time.sleep(2)
-    jellyState.collapse()
-    pygame.display.flip()
-    clock.tick(60)
+    gui.handle_events()
+    gui.display(jellyState)
+    if gui.current_screen == "game_screen":
+        time.sleep(2)
+        jellyState.collapse()
+    gui.tick(60)
