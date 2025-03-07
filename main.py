@@ -176,6 +176,7 @@ jelly1.expand()
 print(jelly1)
 
 jellyState = JellyFieldState("init.txt")
+print(jellyState.goal)
 gui = pygameGUI.pygameGUI()
 
 while True:

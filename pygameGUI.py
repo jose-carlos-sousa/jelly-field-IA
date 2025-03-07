@@ -2,10 +2,6 @@ import pygame
 
 class pygameGUI:
     def __init__(self):
-        """
-        Initializes the pygameGUI with a given screen.
-        :param screen: pygame.Surface - The current screen to render on.
-        """
         pygame.init()
         self.screen = pygame.display.set_mode((1280, 720))
         self.current_screen = "main_menu"
@@ -14,10 +10,6 @@ class pygameGUI:
         self.clock = pygame.time.Clock()
 
     def display(self, state):
-        """
-        Displays the appropriate screen based on the current screen type.
-        :param state: The state to be displayed (only used in game screen).
-        """
         if self.current_screen == "main_menu":
             self.display_main_menu()
         elif self.current_screen == "defeat_screen":
@@ -30,7 +22,6 @@ class pygameGUI:
             self.display_game(state)
 
     def display_main_menu(self):
-        """Displays the main menu screen."""
         self.screen.fill((0, 0, 0))
         title = self.font.render("Jelly Field Puzzle", True, (255, 255, 255))
         title_rect = title.get_rect(center=(self.screen.get_width() // 2, 100))
@@ -49,7 +40,6 @@ class pygameGUI:
         pygame.display.flip()
 
     def handle_main_menu_click(self, pos):
-        """Handles clicks on the main menu buttons."""
         for button_text, rect in self.buttons.items():
             if rect.collidepoint(pos):
                 if button_text == "Play":
@@ -60,58 +50,37 @@ class pygameGUI:
                     self.quit()
     
     def handle_game_click(self, pos):
-        """Handles clicks on game buttons."""
         for button_text, rect in self.buttons.items():
             if rect.collidepoint(pos):
                 if button_text == "Main Menu":
                     self.current_screen = "main_menu"
 
     def display_defeat_screen(self):
-        """Displays the defeat screen."""
         pass
 
     def display_victory_screen(self):
-        """Displays the victory screen."""
         pass
     
     def display_leaderboard_screen(self):
-        """Displays the leaderboard screen."""
         pass
 
     def display_game(self, state):
-        """Displays the game screen with the given state."""
         self.screen.fill((0, 0, 0))
         
-        # Draw main menu button (top left)
         menu_button = self.font.render("Main Menu", True, (255, 255, 255))
         menu_button_rect = menu_button.get_rect(topleft=(10, 10))
         self.screen.blit(menu_button, menu_button_rect)
         self.buttons["Main Menu"] = menu_button_rect
+
+        self.draw_goals(state)
         
-        # Draw score (top right)
         score_text = self.font.render(f"Score: {state.score}", True, (255, 255, 255))
         score_rect = score_text.get_rect(topright=(self.screen.get_width() - 10, 10))
         self.screen.blit(score_text, score_rect)
         
-        # Draw board grid
-        board = state.board
-        rows, cols = len(board), len(board[0])
-        cell_size = 50
-        board_x = (self.screen.get_width() - cols * cell_size) // 2
-        board_y = 100
-        
-        for row in range(rows):
-            for col in range(cols):
-                square = state.board[row][col].array
-                srows, scols = len(square), len(square[0])
-                for square_row in range(srows):
-                    for square_column in range(scols):
-                        cell_color = state.colors[square[square_row][square_column]]
-                        square_width, square_height = cell_size / scols, cell_size / srows
-                        cell_rect = pygame.Rect(board_x + col * cell_size + square_column * square_width,
-                         board_y + row * cell_size + square_height * square_row, square_width, square_height)
-                        pygame.draw.rect(self.screen, cell_color, cell_rect)
-                        pygame.draw.rect(self.screen, (255, 255, 255), cell_rect, 2)
+        self.draw_board(state)
+
+        self.draw_next_jellies(state)
                 
         pygame.display.flip()
 
@@ -130,6 +99,57 @@ class pygameGUI:
                             self.handle_main_menu_click(event.pos)
                         elif self.current_screen == "game_screen":
                             self.handle_game_click(event.pos)
+
+    def draw_board(self, state):
+        board = state.board
+        rows, cols = len(board), len(board[0])
+        cell_size = 50
+        board_x = (self.screen.get_width() - cols * cell_size) // 2
+        board_y = 150
+        
+        for row in range(rows):
+            for col in range(cols):
+                square = board[row][col].array
+                srows, scols = len(square), len(square[0])
+                for square_row in range(srows):
+                    for square_column in range(scols):
+                        cell_color = state.colors[square[square_row][square_column]]
+                        square_width, square_height = cell_size / scols, cell_size / srows
+                        cell_rect = pygame.Rect(board_x + col * cell_size + square_column * square_width,
+                        board_y + row * cell_size + square_height * square_row, square_width, square_height)
+                        pygame.draw.rect(self.screen, cell_color, cell_rect)
+                        pygame.draw.rect(self.screen, (255, 255, 255), cell_rect, 2)
+
+    def draw_goals(self, state):
+        goals = len(state.goal)
+        cell_size = 50
+        goals_x = (self.screen.get_width() - goals * (cell_size) - (goals - 1) * 10) // 2
+        goals_y = 30
+        for i, (color, goal) in enumerate(state.goal.items()):
+            cell_color = state.colors[color]
+            cell_rect = pygame.Rect(goals_x + i * (cell_size + 10), goals_y, cell_size, cell_size)
+            pygame.draw.rect(self.screen, cell_color, cell_rect)
+            text_surface = self.font.render(str(goal), True, (0, 0, 0))  
+            text_rect = text_surface.get_rect(center=cell_rect.center)
+            self.screen.blit(text_surface, text_rect)
+    
+    def draw_next_jellies(self, state):
+        cell_size = 50
+        jellies_x = (self.screen.get_width() - 2 * cell_size - 50) // 2
+        jellies_y = (self.screen.get_height() - cell_size - 100)
+        for i in range(2):
+            square = state.next_jellies[i].array
+            srows, scols = len(square), len(square[0])
+            for square_row in range(srows):
+                for square_column in range(scols):
+                    cell_color = state.colors[square[square_row][square_column]]
+                    square_width, square_height = cell_size / scols, cell_size / srows
+                    cell_rect = pygame.Rect(jellies_x + i * (cell_size + 50) + square_column * square_width,
+                    jellies_y + square_height * square_row, square_width, square_height)
+                    pygame.draw.rect(self.screen, cell_color, cell_rect)
+                    pygame.draw.rect(self.screen, (255, 255, 255), cell_rect, 2)
+
+
 
     def tick(self, fps):
         self.clock.tick(fps)
