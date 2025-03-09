@@ -1,14 +1,15 @@
-
 #For convertion E means empty space, N means Non playable space
 class Jelly:
     def __init__(self, array, type = "normal"):
         if len(array) != 2 or any(len(row) != 2 for row in array):
-            raise ValueError("Each Jelly must be a 2x2 matrix.")
+            print("Each Jelly must be a 2x2 matrix.")
+            return
         self.array = array  # 2x2 color matrix
         if( type == "normal" or type == "na" or type == "empty"):
             self.type = type
         else:
-            raise ValueError("Invalid Jelly Type")
+            print("Invalid Jelly Type")
+            return
         
     def expand(self):
         if(self.type == "empty"):
@@ -61,7 +62,7 @@ class JellyFieldState:
         # Parse colors
         self.colors = {}
         i = 0
-        if( lines[i] == "//DEF COLORS\n"):
+        if lines[i].strip() == "//DEF COLORS":
             i += 1
             while not  lines[i].startswith("//DEF GOAL\n"):
                 color_def = lines[i].strip().split('=')
@@ -72,7 +73,7 @@ class JellyFieldState:
         
         # Parse goal
         self.goal = {}
-        if( lines[i] == "//DEF GOAL\n"):
+        if lines[i].strip() == "//DEF GOAL":
             i+=1
             while not lines[i].startswith("//DEF BOARD\n"):
                 goal_def = lines[i].strip().split('=')
@@ -83,7 +84,7 @@ class JellyFieldState:
                 i += 1
         # Parse board
             self.board = []
-            if lines[i] == "//DEF BOARD\n":
+            if lines[i].strip() == "//DEF BOARD":
                 i += 1
                 while not lines[i].startswith("//DEF SEQ"):
                     if lines[i].strip():
@@ -107,7 +108,7 @@ class JellyFieldState:
 
         # Parse sequence
         self.next_jellies = []
-        if( lines[i] == "//DEF SEQ\n"):
+        if lines[i].strip() == "//DEF SEQ":
             i += 1
             while i < len(lines):
                 if lines[i].strip():
@@ -129,7 +130,8 @@ class JellyFieldState:
         elif direction == 'right':
             pairs = [(jelly1.array[0][1], jelly2.array[0][0]), (jelly1.array[1][1], jelly2.array[1][0])]
         else:
-            raise ValueError("Invalid direction")
+            print("Invalid direction")
+            return None
 
         for color1, color2 in pairs:
             if color1 == color2:
@@ -175,7 +177,7 @@ class JellyFieldState:
             self.board[y][x] = self.next_jellies[seqNum]
             self.next_jellies.pop(seqNum)
         else :
-            raise ValueError("Invalid Jelly Move")
+            print("Invalid Jelly Move")
 
     def __eq__(self, other):
         return (
@@ -225,14 +227,15 @@ class JellyFieldState:
 
 
 def play():
-    file = input("Enter the file name: ")
+
     jellyState = None
     while( not jellyState):
-        jellyState = JellyFieldState(file)
-        if(jellyState == None):
-            print("Invalid File")
-        else:
-            break
+        file = input("Enter the file name: ")
+        try:
+            jellyState = JellyFieldState(file)
+        except Exception as e:
+            print(f"Error loading file: {e}")
+            jellyState = None
     print("Initial Board State:")
     
     jellyState.printBoard()
