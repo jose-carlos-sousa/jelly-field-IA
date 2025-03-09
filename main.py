@@ -159,6 +159,7 @@ class JellyFieldState:
                                     self.board[ni][nj].erase(color)
                                 self.board[i][j].expand()
                                 self.board[ni][nj].expand()
+        
                                 
     def move(self, seqNum, x, y):
         if ((self.board[x][y].type == "empty") and (seqNum == 0 or seqNum == 1)):
