@@ -91,7 +91,13 @@ class JellyFieldState:
                                 [lines[i][j], lines[i][j+1]],
                                 [lines[i+1][j], lines[i+1][j+1]]
                             ]
-                            row.append(Jelly(jelly_array))
+                            jellyType = 'normal'
+                            if(lines[i][j] == 'E' ):
+                                jellyType = "empty"
+                            if(lines[i][j] == 'N' ):
+                                jellyType = "na"
+                                
+                            row.append(Jelly(jelly_array, jellyType))
                         self.board.append(row)
                         i += 2
                 self.c1 = len(self.board)
@@ -153,6 +159,14 @@ class JellyFieldState:
                                     self.board[ni][nj].erase(color)
                                 self.board[i][j].expand()
                                 self.board[ni][nj].expand()
+        
+                                
+    def move(self, seqNum, x, y):
+        if ((self.board[x][y].type == "empty") and (seqNum == 0 or seqNum == 1)):
+            self.board[x][y] = self.next_jellies[seqNum]
+            self.next_jellies.pop(seqNum)
+        else :
+            raise ValueError("Invalid Jelly Move")
 
     def __eq__(self, other):
         return (
@@ -168,10 +182,7 @@ class JellyFieldState:
     def __str__(self):
         return f"Colors {self.colors} Board: {self.board}, Next Jellies: {self.next_jellies}, Goal: {self.goal}"
 
-# Define a 2x2 Jelly (Color 1)
-jelly1 = Jelly([['E', 'A'], ['E', 'B']], "normal")
-jelly1.expand()
-print(jelly1)
+
 
 jellyState = JellyFieldState("init.txt")
 
@@ -180,7 +191,8 @@ for i, row in enumerate(jellyState.board):
     for j, jelly in enumerate(row):
         print(f"Position ({i}, {j}): {jelly}")
 
-jellyState.collapse()
+jellyState.move(0,1,1)
+# jellyState.collapse()
 
 print("\nBoard State After Collapse:")
 for i, row in enumerate(jellyState.board):
