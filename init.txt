@@ -7,13 +7,13 @@ R = 5
 G = 2
 B = 1
 //DEF BOARD
-RRRR
+RRGR
 GGBB
 RREE
 GGEE
 //DEF SEQ
+RR
 GG
-BB
 
 EE
 BB

@@ -23,6 +23,8 @@ class Jelly:
                         if 0 <= ni < 2 and 0 <= nj < 2:
                             if self.array[ni][nj] == 'E':
                                 self.array[ni][nj] = self.array[i][j]
+        if all(self.array[i][j] == 'E' for i in range(2) for j in range(2)):
+            self.type = "empty"
                                 
 
     def erase(self, color):
@@ -141,6 +143,7 @@ class JellyFieldState:
             for i in range(self.c1):
                 for j in range(self.c2):
                     neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
+                    globalCollisionColors = set()
                     for ni, nj in neighbors:
                         if 0 <= ni < self.c1 and 0 <= nj < self.c2:
                             if ni == i - 1:
@@ -153,17 +156,23 @@ class JellyFieldState:
                                 direction = 'right'
                             collisionColors = self.checkCollision(self.board[i][j], self.board[ni][nj], direction)
                             if collisionColors:
-                                changes = True
                                 for color in collisionColors:
-                                    self.board[i][j].erase(color)
-                                    self.board[ni][nj].erase(color)
-                                self.board[i][j].expand()
-                                self.board[ni][nj].expand()
+                                    if color not in ['E', 'N']:
+                                        changes = True
+                                        globalCollisionColors.add(color)
+                                        self.goal[color] = max(self.goal[color] - 1, 0)
+                                        self.board[ni][nj].erase(color)
+                                        self.board[ni][nj].expand()
+                                        
+                    for color in globalCollisionColors:
+                        self.board[i][j].erase(color)
+                        self.goal[color] = max(self.goal[color] - 1, 0)
+                        self.board[i][j].expand()
         
                                 
     def move(self, seqNum, x, y):
-        if ((self.board[x][y].type == "empty") and (seqNum == 0 or seqNum == 1)):
-            self.board[x][y] = self.next_jellies[seqNum]
+        if ((self.board[y][x].type == "empty") and (seqNum == 0 or seqNum == 1)):
+            self.board[y][x] = self.next_jellies[seqNum]
             self.next_jellies.pop(seqNum)
         else :
             raise ValueError("Invalid Jelly Move")
@@ -181,20 +190,71 @@ class JellyFieldState:
 
     def __str__(self):
         return f"Colors {self.colors} Board: {self.board}, Next Jellies: {self.next_jellies}, Goal: {self.goal}"
+    def printBoard(self): #depois fica a logica das cenas do ricardo aqui
+        for row in self.board:
+            for i in range(2):
+                for jelly in row:
+                    print("".join(jelly.array[i]), end=" ")
+                print()
+        print()
+        print("Next Jellies:")
+        for jelly in self.next_jellies:
+            for i in range(2):
+                print("".join(jelly.array[i]))
+            print()
+        print()
+        print("Goal:")
+        for color, goal in self.goal.items():
+            print(f"{color}: {goal}")
+        print()
+    
+    def isGoal(self):
+        for _, goal in self.goal.items():
+            if goal != 0:
+                return False
+        return True
+    
+    def isBoardFull(self):
+        for row in self.board:
+            for jelly in row:
+                if jelly.type == "empty":
+                    return False
+        return True
+            
 
 
 
-jellyState = JellyFieldState("init.txt")
+def play():
+    file = input("Enter the file name: ")
+    jellyState = None
+    while( not jellyState):
+        jellyState = JellyFieldState(file)
+        if(jellyState == None):
+            print("Invalid File")
+        else:
+            break
+    print("Initial Board State:")
+    
+    jellyState.printBoard()
+    
+    hasWon = False
+    
+    while not hasWon:
+        seqNum = int(input("Enter the sequence number: "))
+        x = int(input("Enter the x coordinate: "))
+        y = int(input("Enter the y coordinate: "))
+        jellyState.move(seqNum, x, y)
+        jellyState.collapse()
+        jellyState.printBoard()
+        if jellyState.isGoal():
+            hasWon = True
+            print("You have won!")
+            break
+        
+        elif jellyState.isBoardFull():
+            hasWon = True
+            print("You have lost!")
+            break
 
-print("Initial Board State:")
-for i, row in enumerate(jellyState.board):
-    for j, jelly in enumerate(row):
-        print(f"Position ({i}, {j}): {jelly}")
 
-jellyState.move(0,1,1)
-# jellyState.collapse()
-
-print("\nBoard State After Collapse:")
-for i, row in enumerate(jellyState.board):
-    for j, jelly in enumerate(row):
-        print(f"Position ({i}, {j}): {jelly}")
+play()
