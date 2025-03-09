@@ -240,9 +240,9 @@ def play():
     
     jellyState.printBoard()
     
-    hasWon = False
+    end = False
     
-    while not hasWon:
+    while not end:
         seqNum = int(input("Enter the sequence number: "))
         x = int(input("Enter the x coordinate: "))
         y = int(input("Enter the y coordinate: "))
@@ -250,12 +250,12 @@ def play():
         jellyState.collapse()
         jellyState.printBoard()
         if jellyState.isGoal():
-            hasWon = True
+            end = True
             print("You have won!")
             break
         
         elif jellyState.isBoardFull():
-            hasWon = True
+            end = True
             print("You have lost!")
             break
 
