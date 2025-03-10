@@ -4,12 +4,14 @@ import pygameGUI, time
 class Jelly:
     def __init__(self, array, type = "normal"):
         if len(array) != 2 or any(len(row) != 2 for row in array):
-            raise ValueError("Each Jelly must be a 2x2 matrix.")
+            print("Each Jelly must be a 2x2 matrix.")
+            return
         self.array = array  # 2x2 color matrix
         if( type == "normal" or type == "na" or type == "empty"):
             self.type = type
         else:
-            raise ValueError("Invalid Jelly Type")
+            print("Invalid Jelly Type")
+            return
         
     def expand(self):
         if(self.type == "empty"):
@@ -24,6 +26,8 @@ class Jelly:
                         if 0 <= ni < 2 and 0 <= nj < 2:
                             if self.array[ni][nj] == 'E':
                                 self.array[ni][nj] = self.array[i][j]
+        if all(self.array[i][j] == 'E' for i in range(2) for j in range(2)):
+            self.type = "empty"
                                 
 
     def erase(self, color):
@@ -61,7 +65,7 @@ class JellyFieldState:
         # Parse colors
         self.colors = {}
         i = 0
-        if( lines[i] == "//DEF COLORS\n"):
+        if lines[i].strip() == "//DEF COLORS":
             i += 1
             while not  lines[i].startswith("//DEF GOAL\n"):
                 color_def = lines[i].strip().split('=')
@@ -72,7 +76,7 @@ class JellyFieldState:
         
         # Parse goal
         self.goal = {}
-        if( lines[i] == "//DEF GOAL\n"):
+        if lines[i].strip() == "//DEF GOAL":
             i+=1
             while not lines[i].startswith("//DEF BOARD\n"):
                 goal_def = lines[i].strip().split('=')
@@ -83,7 +87,7 @@ class JellyFieldState:
                 i += 1
         # Parse board
             self.board = []
-            if lines[i] == "//DEF BOARD\n":
+            if lines[i].strip() == "//DEF BOARD":
                 i += 1
                 while not lines[i].startswith("//DEF SEQ"):
                     if lines[i].strip():
@@ -93,7 +97,13 @@ class JellyFieldState:
                                 [lines[i][j], lines[i][j+1]],
                                 [lines[i+1][j], lines[i+1][j+1]]
                             ]
-                            row.append(Jelly(jelly_array))
+                            jellyType = 'normal'
+                            if(lines[i][j] == 'E' ):
+                                jellyType = "empty"
+                            if(lines[i][j] == 'N' ):
+                                jellyType = "na"
+                                
+                            row.append(Jelly(jelly_array, jellyType))
                         self.board.append(row)
                         i += 2
                 self.c1 = len(self.board)
@@ -101,7 +111,7 @@ class JellyFieldState:
 
         # Parse sequence
         self.next_jellies = []
-        if( lines[i] == "//DEF SEQ\n"):
+        if lines[i].strip() == "//DEF SEQ":
             i += 1
             while i < len(lines):
                 if lines[i].strip():
@@ -123,7 +133,8 @@ class JellyFieldState:
         elif direction == 'right':
             pairs = [(jelly1.array[0][1], jelly2.array[0][0]), (jelly1.array[1][1], jelly2.array[1][0])]
         else:
-            raise ValueError("Invalid direction")
+            print("Invalid direction")
+            return None
 
         for color1, color2 in pairs:
             if color1 == color2:
@@ -137,6 +148,7 @@ class JellyFieldState:
             for i in range(self.c1):
                 for j in range(self.c2):
                     neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
+                    globalCollisionColors = set()
                     for ni, nj in neighbors:
                         if 0 <= ni < self.c1 and 0 <= nj < self.c2:
                             if ni == i - 1:
@@ -149,12 +161,26 @@ class JellyFieldState:
                                 direction = 'right'
                             collisionColors = self.checkCollision(self.board[i][j], self.board[ni][nj], direction)
                             if collisionColors:
-                                changes = True
                                 for color in collisionColors:
-                                    self.board[i][j].erase(color)
-                                    self.board[ni][nj].erase(color)
-                                self.board[i][j].expand()
-                                self.board[ni][nj].expand()
+                                    if color not in ['E', 'N']:
+                                        changes = True
+                                        globalCollisionColors.add(color)
+                                        self.goal[color] = max(self.goal[color] - 1, 0)
+                                        self.board[ni][nj].erase(color)
+                                        self.board[ni][nj].expand()
+                                        
+                    for color in globalCollisionColors:
+                        self.board[i][j].erase(color)
+                        self.goal[color] = max(self.goal[color] - 1, 0)
+                        self.board[i][j].expand()
+        
+                                
+    def move(self, seqNum, x, y):
+        if ((self.board[y][x].type == "empty") and (seqNum == 0 or seqNum == 1)):
+            self.board[y][x] = self.next_jellies[seqNum]
+            self.next_jellies.pop(seqNum)
+        else :
+            print("Invalid Jelly Move")
 
     def __eq__(self, other):
         return (
@@ -169,20 +195,71 @@ class JellyFieldState:
 
     def __str__(self):
         return f"Colors {self.colors} Board: {self.board}, Next Jellies: {self.next_jellies}, Goal: {self.goal}"
+    def printBoard(self): #depois fica a logica das cenas do ricardo aqui
+        for row in self.board:
+            for i in range(2):
+                for jelly in row:
+                    print("".join(jelly.array[i]), end=" ")
+                print()
+        print()
+        print("Next Jellies:")
+        for jelly in self.next_jellies:
+            for i in range(2):
+                print("".join(jelly.array[i]))
+            print()
+        print()
+        print("Goal:")
+        for color, goal in self.goal.items():
+            print(f"{color}: {goal}")
+        print()
+    
+    def isGoal(self):
+        for _, goal in self.goal.items():
+            if goal != 0:
+                return False
+        return True
+    
+    def isBoardFull(self):
+        for row in self.board:
+            for jelly in row:
+                if jelly.type == "empty":
+                    return False
+        return True
+            
 
-# Define a 2x2 Jelly (Color 1)
-jelly1 = Jelly([['E', 'A'], ['E', 'B']], "normal")
-jelly1.expand()
-print(jelly1)
 
-jellyState = JellyFieldState("init.txt")
-print(jellyState.goal)
-gui = pygameGUI.pygameGUI()
 
-while True:
-    gui.handle_events()
-    gui.display(jellyState)
-    if gui.current_screen == "game_screen":
-        time.sleep(2)
-        jellyState.collapse()
-    gui.tick(60)
+def play():
+    gui = pygameGUI.pygameGUI()
+    jellyState = None
+    while( not jellyState):
+        file = input("Enter the file name: ")
+        try:
+            jellyState = JellyFieldState(file)
+        except Exception as e:
+            print(f"Error loading file: {e}")
+            jellyState = None
+    print("Initial Board State:")
+    
+    jellyState.printBoard()
+    
+    end = False
+    
+    while not end:
+        move, seqNum, x, y = gui.handle_events(jellyState)
+        gui.display(jellyState)
+        if move:
+            jellyState.move(seqNum, x, y)
+            jellyState.collapse()
+        if jellyState.isGoal():
+            end = True
+            print("You have won!")
+            break
+        
+        elif jellyState.isBoardFull():
+            end = True
+            print("You have lost!")
+            break
+
+
+play()

@@ -8,6 +8,8 @@ class pygameGUI:
         self.font = pygame.font.Font(None, 48)
         self.buttons = {}
         self.clock = pygame.time.Clock()
+        self.dragging = False
+        self.selected_jelly = None
 
     def display(self, state):
         if self.current_screen == "main_menu":
@@ -84,21 +86,49 @@ class pygameGUI:
                 
         pygame.display.flip()
 
-    def get_move(self):
-        """
-        Captures and returns the player's move.
-        """
-        pass
 
-    def handle_events(self):
+    def handle_events(self, state):
+        cell_size = 50
+        jellies_x = (self.screen.get_width() - 2 * cell_size - 50) // 2
+        jellies_y = (self.screen.get_height() - cell_size - 100)
+
         for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.quit()
-                    elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        if self.current_screen == "main_menu":
-                            self.handle_main_menu_click(event.pos)
-                        elif self.current_screen == "game_screen":
-                            self.handle_game_click(event.pos)
+            if event.type == pygame.QUIT:
+                self.quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if self.current_screen == "main_menu":
+                        self.handle_main_menu_click(event.pos)
+                    elif self.current_screen == "game_screen":
+                        self.handle_game_click(event.pos)
+                mouse_x, mouse_y = event.pos
+                
+                for i in range(2):
+                    square = state.next_jellies[i].array
+                    srows, scols = len(square), len(square[0])
+                    jelly_rect = pygame.Rect(jellies_x + i * (cell_size + 50), jellies_y, cell_size, cell_size)
+                    
+                    if jelly_rect.collidepoint(mouse_x, mouse_y):
+                        self.dragging = True
+                        self.selected_jelly = i
+                        break
+
+            elif event.type == pygame.MOUSEBUTTONUP and self.dragging:
+                mouse_x, mouse_y = event.pos
+                board_x = (self.screen.get_width() - len(state.board[0]) * cell_size) // 2
+                board_y = 150
+                
+                col = (mouse_x - board_x) // cell_size
+                row = (mouse_y - board_y) // cell_size
+                
+                print(f"dropped {self.selected_jelly} at {row},{col}")
+                if 0 <= row < len(state.board) and 0 <= col < len(state.board[0]):
+                    return True, self.selected_jelly, row, col
+                
+                self.dragging = False
+                self.selected_jelly = None
+            
+        return False, None, None, None 
 
     def draw_board(self, state):
         board = state.board
