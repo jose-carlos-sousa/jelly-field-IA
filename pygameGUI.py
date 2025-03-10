@@ -103,7 +103,7 @@ class pygameGUI:
                         self.handle_game_click(event.pos)
                 mouse_x, mouse_y = event.pos
                 
-                for i in range(2):
+                for i in range(min(2, len(state.next_jellies))):
                     square = state.next_jellies[i].array
                     srows, scols = len(square), len(square[0])
                     jelly_rect = pygame.Rect(jellies_x + i * (cell_size + 50), jellies_y, cell_size, cell_size)
@@ -123,7 +123,7 @@ class pygameGUI:
                 
                 print(f"dropped {self.selected_jelly} at {row},{col}")
                 if 0 <= row < len(state.board) and 0 <= col < len(state.board[0]):
-                    return True, self.selected_jelly, row, col
+                    return True, self.selected_jelly, col, row
                 
                 self.dragging = False
                 self.selected_jelly = None
@@ -167,7 +167,7 @@ class pygameGUI:
         cell_size = 50
         jellies_x = (self.screen.get_width() - 2 * cell_size - 50) // 2
         jellies_y = (self.screen.get_height() - cell_size - 100)
-        for i in range(2):
+        for i in range(min(2, len(state.next_jellies))):
             square = state.next_jellies[i].array
             srows, scols = len(square), len(square[0])
             for square_row in range(srows):
@@ -178,7 +178,6 @@ class pygameGUI:
                     jellies_y + square_height * square_row, square_width, square_height)
                     pygame.draw.rect(self.screen, cell_color, cell_rect)
                     pygame.draw.rect(self.screen, (255, 255, 255), cell_rect, 2)
-
 
 
     def tick(self, fps):
