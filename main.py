@@ -1,3 +1,5 @@
+import pygameGUI, time
+
 #For convertion E means empty space, N means Non playable space
 class Jelly:
     def __init__(self, array, type = "normal"):
@@ -55,6 +57,7 @@ class JellyFieldState:
             self.next_jellies = []
             self.goal = {}
             self.colors = {}
+        self.score = 0
 
     def load_from_file(self, file):
         with open(file, 'r') as f:
@@ -227,7 +230,7 @@ class JellyFieldState:
 
 
 def play():
-
+    gui = pygameGUI.pygameGUI()
     jellyState = None
     while( not jellyState):
         file = input("Enter the file name: ")
@@ -243,12 +246,11 @@ def play():
     end = False
     
     while not end:
-        seqNum = int(input("Enter the sequence number: "))
-        x = int(input("Enter the x coordinate: "))
-        y = int(input("Enter the y coordinate: "))
-        jellyState.move(seqNum, x, y)
-        jellyState.collapse()
-        jellyState.printBoard()
+        move, seqNum, x, y = gui.handle_events(jellyState)
+        gui.display(jellyState)
+        if move:
+            jellyState.move(seqNum, x, y)
+            jellyState.collapse()
         if jellyState.isGoal():
             end = True
             print("You have won!")
