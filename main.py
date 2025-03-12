@@ -1,5 +1,5 @@
 import pygameGUI, time
-
+import copy
 #For convertion E means empty space, N means Non playable space
 class Jelly:
     def __init__(self, array, type = "normal"):
@@ -19,17 +19,14 @@ class Jelly:
         if(self.type == "na"):
             return
         newBoard = [row.copy() for row in self.array]
-        print(f"Expanding {self.array}")
         for i in range(2):
             for j in range(2):
-                print(f" iam in {i} {j}")
                 if self.array[i][j] != 'E':
                     newBoard[i][j] = self.array[i][j]
                     neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
                     for ni, nj in neighbors:
                         if 0 <= ni < 2 and 0 <= nj < 2:
                             if self.array[ni][nj] == 'E':
-                                print(f"changed color {ni} {nj}")
                                 newBoard[ni][nj] = self.array[i][j]
                             
         self.array = newBoard
@@ -152,12 +149,15 @@ class JellyFieldState:
         changes = True
         while changes:
             changes = False
+            oldBoard = copy.deepcopy(self.board)
             for i in range(self.c1):
                 for j in range(self.c2):
+                    print(f"Checking {i},{j}")
                     neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
                     globalCollisionColors = set()
                     for ni, nj in neighbors:
                         if 0 <= ni < self.c1 and 0 <= nj < self.c2:
+                            print(f"Checking neighbor {ni},{nj}")
                             if ni == i - 1:
                                 direction = 'up'
                             elif ni == i + 1:
@@ -166,7 +166,7 @@ class JellyFieldState:
                                 direction = 'left'
                             elif nj == j + 1:
                                 direction = 'right'
-                            collisionColors = self.checkCollision(self.board[i][j], self.board[ni][nj], direction)
+                            collisionColors = self.checkCollision(oldBoard[i][j], oldBoard[ni][nj], direction)
                             if collisionColors:
                                 for color in collisionColors:
                                     if color not in ['E', 'N']:
@@ -174,7 +174,7 @@ class JellyFieldState:
                                         globalCollisionColors.add(color)
                                         self.goal[color] = max(self.goal[color] - 1, 0)
                                         self.board[ni][nj].erase(color)
-                            self.board[ni][nj].expand()
+                                        self.board[ni][nj].expand()
                                         
                     for color in globalCollisionColors:
                         self.board[i][j].erase(color)
