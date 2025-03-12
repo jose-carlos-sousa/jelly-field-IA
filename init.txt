@@ -2,19 +2,20 @@
 R = (255,0,0)
 G = (0,255,0)
 B = (0,0,255)
+C = (200,200,0)
 E = (0,0,0)
 //DEF GOAL
 R = 5
 G = 2
 B = 1
 //DEF BOARD
-RRGR
-GGBB
+EEEE
+EEEE
 RBEE
-GBEE
+GCEE
 //DEF SEQ
 BB
-BB
+CC
 
 BB
 EE

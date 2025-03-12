@@ -172,13 +172,15 @@ class JellyFieldState:
                                     if color not in ['E', 'N']:
                                         changes = True
                                         globalCollisionColors.add(color)
-                                        self.goal[color] = max(self.goal[color] - 1, 0)
+                                        if (color in self.goal):
+                                            self.goal[color] = max(self.goal[color] - 1, 0)
                                         self.board[ni][nj].erase(color)
                                         self.board[ni][nj].expand()
                                         
                     for color in globalCollisionColors:
                         self.board[i][j].erase(color)
-                        self.goal[color] = max(self.goal[color] - 1, 0)
+                        if (color in self.goal):
+                            self.goal[color] = max(self.goal[color] - 1, 0)
                         self.board[i][j].expand()
         
                                 
