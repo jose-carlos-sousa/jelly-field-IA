@@ -134,12 +134,13 @@ class pygameGUI:
                 
                 col = (mouse_x - board_x) // self.cell_size
                 row = (mouse_y - board_y) // self.cell_size
+
+                for i in range(len(state.next_jellies)):
+                    self.jelly_positions[i] = pygame.Rect(((self.screen.get_width() - 2 * self.cell_size - 50) // 2) + i * (self.cell_size + 50), 
+                                                (self.screen.get_height() - self.cell_size - 100), 
+                                                self.cell_size, self.cell_size)
                 
                 if 0 <= row < len(state.board) and 0 <= col < len(state.board[0]):
-                    for i in range(len(state.next_jellies)):
-                        self.jelly_positions[i] = pygame.Rect(((self.screen.get_width() - 2 * self.cell_size - 50) // 2) + i * (self.cell_size + 50), 
-                                                    (self.screen.get_height() - self.cell_size - 100), 
-                                                    self.cell_size, self.cell_size)
                     return True, selected_jelly, col, row
             
         return False, None, None, None 
