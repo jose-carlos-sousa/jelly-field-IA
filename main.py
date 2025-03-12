@@ -18,14 +18,21 @@ class Jelly:
             return
         if(self.type == "na"):
             return
+        newBoard = [row.copy() for row in self.array]
+        print(f"Expanding {self.array}")
         for i in range(2):
             for j in range(2):
+                print(f" iam in {i} {j}")
                 if self.array[i][j] != 'E':
+                    newBoard[i][j] = self.array[i][j]
                     neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
                     for ni, nj in neighbors:
                         if 0 <= ni < 2 and 0 <= nj < 2:
                             if self.array[ni][nj] == 'E':
-                                self.array[ni][nj] = self.array[i][j]
+                                print(f"changed color {ni} {nj}")
+                                newBoard[ni][nj] = self.array[i][j]
+                            
+        self.array = newBoard
         if all(self.array[i][j] == 'E' for i in range(2) for j in range(2)):
             self.type = "empty"
                                 
@@ -167,7 +174,7 @@ class JellyFieldState:
                                         globalCollisionColors.add(color)
                                         self.goal[color] = max(self.goal[color] - 1, 0)
                                         self.board[ni][nj].erase(color)
-                                        self.board[ni][nj].expand()
+                            self.board[ni][nj].expand()
                                         
                     for color in globalCollisionColors:
                         self.board[i][j].erase(color)
@@ -226,6 +233,9 @@ class JellyFieldState:
                     return False
         return True
             
+            
+
+    
 
 
 
