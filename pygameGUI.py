@@ -1,15 +1,24 @@
 import pygame
 
 class pygameGUI:
-    def __init__(self):
+    def __init__(self, state):
         pygame.init()
         self.screen = pygame.display.set_mode((1280, 720))
+        self.offset_x = 0
+        self.offset_y = 0
         self.current_screen = "main_menu"
         self.font = pygame.font.Font(None, 48)
+        self.cell_size = 50
         self.buttons = {}
         self.clock = pygame.time.Clock()
         self.dragging = False
         self.selected_jelly = None
+        self.jelly_positions = {}
+        for i in range(len(state.next_jellies)):
+            self.jelly_positions[i] = pygame.Rect(((self.screen.get_width() - 2 * self.cell_size - 50) // 2) + i * (self.cell_size + 50), 
+                                        (self.screen.get_height() - self.cell_size - 100), 
+                                        self.cell_size, self.cell_size)
+
 
     def display(self, state):
         if self.current_screen == "main_menu":
@@ -88,10 +97,6 @@ class pygameGUI:
 
 
     def handle_events(self, state):
-        cell_size = 50
-        jellies_x = (self.screen.get_width() - 2 * cell_size - 50) // 2
-        jellies_y = (self.screen.get_height() - cell_size - 100)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit()
@@ -106,35 +111,43 @@ class pygameGUI:
                 for i in range(min(2, len(state.next_jellies))):
                     square = state.next_jellies[i].array
                     srows, scols = len(square), len(square[0])
-                    jelly_rect = pygame.Rect(jellies_x + i * (cell_size + 50), jellies_y, cell_size, cell_size)
-                    
+                    jelly_rect = self.jelly_positions[i]
                     if jelly_rect.collidepoint(mouse_x, mouse_y):
                         self.dragging = True
                         self.selected_jelly = i
+                        self.offset_x = jelly_rect.x - event.pos[0]
+                        self.offset_y = jelly_rect.y - event.pos[1]
                         break
 
+            elif event.type == pygame.MOUSEMOTION and self.dragging:
+                self.jelly_positions[self.selected_jelly].x = event.pos[0] + self.offset_x
+                self.jelly_positions[self.selected_jelly].y = event.pos[1] + self.offset_y
+
+
             elif event.type == pygame.MOUSEBUTTONUP and self.dragging:
-                mouse_x, mouse_y = event.pos
-                board_x = (self.screen.get_width() - len(state.board[0]) * cell_size) // 2
-                board_y = 150
-                
-                col = (mouse_x - board_x) // cell_size
-                row = (mouse_y - board_y) // cell_size
-                
-                print(f"dropped {self.selected_jelly} at {row},{col}")
-                if 0 <= row < len(state.board) and 0 <= col < len(state.board[0]):
-                    return True, self.selected_jelly, col, row
-                
+                selected_jelly = self.selected_jelly
                 self.dragging = False
                 self.selected_jelly = None
+                mouse_x, mouse_y = event.pos
+                board_x = (self.screen.get_width() - len(state.board[0]) * self.cell_size) // 2
+                board_y = 150
+                
+                col = (mouse_x - board_x) // self.cell_size
+                row = (mouse_y - board_y) // self.cell_size
+                
+                if 0 <= row < len(state.board) and 0 <= col < len(state.board[0]):
+                    for i in range(len(state.next_jellies)):
+                        self.jelly_positions[i] = pygame.Rect(((self.screen.get_width() - 2 * self.cell_size - 50) // 2) + i * (self.cell_size + 50), 
+                                                    (self.screen.get_height() - self.cell_size - 100), 
+                                                    self.cell_size, self.cell_size)
+                    return True, selected_jelly, col, row
             
         return False, None, None, None 
 
     def draw_board(self, state):
         board = state.board
         rows, cols = len(board), len(board[0])
-        cell_size = 50
-        board_x = (self.screen.get_width() - cols * cell_size) // 2
+        board_x = (self.screen.get_width() - cols * self.cell_size) // 2
         board_y = 150
         
         for row in range(rows):
@@ -144,38 +157,35 @@ class pygameGUI:
                 for square_row in range(srows):
                     for square_column in range(scols):
                         cell_color = state.colors[square[square_row][square_column]]
-                        square_width, square_height = cell_size / scols, cell_size / srows
-                        cell_rect = pygame.Rect(board_x + col * cell_size + square_column * square_width,
-                        board_y + row * cell_size + square_height * square_row, square_width, square_height)
+                        square_width, square_height = self.cell_size / scols, self.cell_size / srows
+                        cell_rect = pygame.Rect(board_x + col * self.cell_size + square_column * square_width,
+                        board_y + row * self.cell_size + square_height * square_row, square_width, square_height)
                         pygame.draw.rect(self.screen, cell_color, cell_rect)
                         pygame.draw.rect(self.screen, (255, 255, 255), cell_rect, 2)
 
     def draw_goals(self, state):
         goals = len(state.goal)
-        cell_size = 50
-        goals_x = (self.screen.get_width() - goals * (cell_size) - (goals - 1) * 10) // 2
+        goals_x = (self.screen.get_width() - goals * (self.cell_size) - (goals - 1) * 10) // 2
         goals_y = 30
         for i, (color, goal) in enumerate(state.goal.items()):
             cell_color = state.colors[color]
-            cell_rect = pygame.Rect(goals_x + i * (cell_size + 10), goals_y, cell_size, cell_size)
+            cell_rect = pygame.Rect(goals_x + i * (self.cell_size + 10), goals_y, self.cell_size, self.cell_size)
             pygame.draw.rect(self.screen, cell_color, cell_rect)
             text_surface = self.font.render(str(goal), True, (0, 0, 0))  
             text_rect = text_surface.get_rect(center=cell_rect.center)
             self.screen.blit(text_surface, text_rect)
     
     def draw_next_jellies(self, state):
-        cell_size = 50
-        jellies_x = (self.screen.get_width() - 2 * cell_size - 50) // 2
-        jellies_y = (self.screen.get_height() - cell_size - 100)
         for i in range(min(2, len(state.next_jellies))):
             square = state.next_jellies[i].array
             srows, scols = len(square), len(square[0])
             for square_row in range(srows):
                 for square_column in range(scols):
                     cell_color = state.colors[square[square_row][square_column]]
-                    square_width, square_height = cell_size / scols, cell_size / srows
-                    cell_rect = pygame.Rect(jellies_x + i * (cell_size + 50) + square_column * square_width,
-                    jellies_y + square_height * square_row, square_width, square_height)
+                    square_width, square_height = self.cell_size / scols, self.cell_size / srows
+                    jelly_rect = self.jelly_positions[i]
+                    cell_rect = pygame.Rect(jelly_rect.x + square_column * square_width,
+                    jelly_rect.y + square_height * square_row, square_width, square_height)
                     pygame.draw.rect(self.screen, cell_color, cell_rect)
                     pygame.draw.rect(self.screen, (255, 255, 255), cell_rect, 2)
 
