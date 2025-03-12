@@ -240,7 +240,6 @@ class JellyFieldState:
 
 
 def play():
-    gui = pygameGUI.pygameGUI()
     jellyState = None
     while( not jellyState):
         file = input("Enter the file name: ")
@@ -253,6 +252,7 @@ def play():
     
     jellyState.printBoard()
     
+    gui = pygameGUI.pygameGUI(jellyState)
     end = False
     
     while not end:
