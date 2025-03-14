@@ -1,5 +1,6 @@
 import pygameGUI, time
 import copy
+from collections import deque
 #For convertion E means empty space, N means Non playable space
 class Jelly:
     def __init__(self, array, type = "normal"):
@@ -62,7 +63,19 @@ class JellyFieldState:
             self.goal = {}
             self.colors = {}
         self.score = 0
-
+    def get_next_states(self):
+        newStates = []
+        for i in range(self.c1):
+            for j in range(self.c2):
+                if self.board[i][j].type == "empty":
+                    for seqNum in range(2):
+                        newState = copy.deepcopy(self)
+                        newState.move(seqNum, i, j)
+                        newState.collapse()
+                        if newState and newState != self :
+                            newStates.append(newState)
+        return newStates
+                        
     def load_from_file(self, file):
         with open(file, 'r') as f:
             lines = f.readlines()
@@ -152,12 +165,11 @@ class JellyFieldState:
             oldBoard = copy.deepcopy(self.board)
             for i in range(self.c1):
                 for j in range(self.c2):
-                    print(f"Checking {i},{j}")
                     neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
                     globalCollisionColors = set()
                     for ni, nj in neighbors:
                         if 0 <= ni < self.c1 and 0 <= nj < self.c2:
-                            print(f"Checking neighbor {ni},{nj}")
+                    
                             if ni == i - 1:
                                 direction = 'up'
                             elif ni == i + 1:
@@ -233,11 +245,6 @@ class JellyFieldState:
                     return False
         return True
             
-            
-
-    
-
-
 
 def play():
     jellyState = None
@@ -271,5 +278,40 @@ def play():
             print("You have lost!")
             break
 
+class TreeNode:
+    def __init__(self, state, parent=None):
+        self.state = state
+        self.parent = parent
+        self.children = []
 
+    def add_child(self, child_node):
+        self.children.append(child_node)
+        child_node.parent = self
+        
+def bfs_search(initialState):
+    root = TreeNode(initialState)
+    queue = deque([root])
+    while queue:
+        node = queue.popleft()
+        if(node.state.isGoal()):
+            return node
+        for state in node.state.get_next_states():
+            child = TreeNode(state)
+            node.add_child(child)
+            queue.append(child)
+    return None
+    
+def print_solution(node):
+
+    while (node.parent):
+        node.state.printBoard()
+        node = node.parent
+    node.state.printBoard()
+
+    return   
 play()
+
+jellyState = JellyFieldState("init.txt")
+
+newState = bfs_search(jellyState)
+print_solution(newState)
