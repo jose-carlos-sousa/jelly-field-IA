@@ -1,4 +1,4 @@
-import pygameGUI, time
+import pygameGUI, time, ai
 import copy
 #For convertion E means empty space, N means Non playable space
 class Jelly:
@@ -32,7 +32,9 @@ class Jelly:
         self.array = newBoard
         if all(self.array[i][j] == 'E' for i in range(2) for j in range(2)):
             self.type = "empty"
-                                
+
+    def is_empty(self):
+        return self.type == "empty"              
 
     def erase(self, color):
         for i in range(2):
@@ -234,11 +236,6 @@ class JellyFieldState:
         return True
             
             
-
-    
-
-
-
 def play():
     jellyState = None
     while( not jellyState):
@@ -272,4 +269,21 @@ def play():
             break
 
 
-play()
+def play_ai():
+    jellyState = None
+    while( not jellyState):
+        file = input("Enter the file name: ")
+        try:
+            jellyState = JellyFieldState(file)
+        except Exception as e:
+            print(f"Error loading file: {e}")
+            jellyState = None
+    print("Initial Board State:")
+    
+    jellyState.printBoard()
+    agent = ai.AIAgent(jellyState)
+    goal = agent.depth_first_search(agent.goal_state, agent.get_child_states)
+    agent.print_solution(goal)
+
+#play()
+play_ai()
