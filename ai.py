@@ -55,24 +55,30 @@ class AIAgent:
     def bfs_search(self):
         root = TreeNode(self.initial_state)
         queue = deque([root])
+        visited = [root]
         while queue:
             node = queue.popleft()
-            if(node.state.isGoal()):
+            if self.goal_state(node.state):
                 return node
             for state in self.get_child_states(node.state):
-                child = TreeNode(state)
-                node.add_child(child)
-                queue.append(child)
+                if state not in visited:
+                    visited.append(state)
+                    child = TreeNode(state)
+                    node.add_child(child)
+                    queue.append(child)
         return None
     
     def print_solution(self, node):
 
         steps = 0
+        if (not node):
+            print("NO SOLUTION FOUND MENDES!")
+            return
+
         while (node.parent):
-            #node.state.printBoard()
             steps += 1
             node = node.parent
-        #node.state.printBoard()
+   
         print(f"Solution found in {steps} steps\n")
         return  
 

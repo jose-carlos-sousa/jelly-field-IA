@@ -277,7 +277,7 @@ def play_ai():
     
     jellyState.printBoard()
     gajo = ai.AIAgent(jellyState)
-    solution = gajo.depth_first_search()
+    solution = gajo.bfs_search()
     gajo.print_solution(solution)
 
 play_ai()
