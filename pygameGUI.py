@@ -85,9 +85,10 @@ class pygameGUI:
 
         self.draw_goals(state)
         
-        score_text = self.font.render(f"Score: {state.score}", True, (255, 255, 255))
-        score_rect = score_text.get_rect(topright=(self.screen.get_width() - 10, 10))
-        self.screen.blit(score_text, score_rect)
+        #score_text = self.font.render(f"Score: {state.score}", True, (255, 255, 255))
+        #score_rect = score_text.get_rect(topright=(self.screen.get_width() - 10, 10))
+        #self.screen.blit(score_text, score_rect)
+        
         
         self.draw_board(state)
 
