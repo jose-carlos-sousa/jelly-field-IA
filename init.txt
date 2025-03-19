@@ -14,9 +14,6 @@ RBEE
 GBEE
 //DEF SEQ
 BB
-BB
-
-BB
 EE
 
 RR
