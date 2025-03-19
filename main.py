@@ -219,12 +219,6 @@ class JellyFieldState:
             print(f"{color}: {goal}")
         print()
     
-    def isGoal(self):
-        for _, goal in self.goal.items():
-            if goal != 0:
-                return False
-        return True
-    
     def isBoardFull(self):
         for row in self.board:
             for jelly in row:
@@ -277,7 +271,7 @@ def play_ai():
     
     jellyState.printBoard()
     gajo = ai.AIAgent(jellyState)
-    solution = gajo.bfs_search()
+    solution = gajo.iterative_deepening()
     gajo.print_solution(solution)
 
 play_ai()
