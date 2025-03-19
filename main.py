@@ -1,4 +1,4 @@
-import pygameGUI, time
+import pygameGUI, time, ai
 import copy
 from collections import deque
 #For convertion E means empty space, N means Non playable space
@@ -33,7 +33,9 @@ class Jelly:
         self.array = newBoard
         if all(self.array[i][j] == 'E' for i in range(2) for j in range(2)):
             self.type = "empty"
-                                
+
+    def is_empty(self):
+        return self.type == "empty"              
 
     def erase(self, color):
         for i in range(2):
@@ -63,18 +65,6 @@ class JellyFieldState:
             self.goal = {}
             self.colors = {}
         self.score = 0
-    def get_next_states(self):
-        newStates = []
-        for i in range(self.c1):
-            for j in range(self.c2):
-                if self.board[i][j].type == "empty":
-                    for seqNum in range(2):
-                        newState = copy.deepcopy(self)
-                        newState.move(seqNum, i, j)
-                        newState.collapse()
-                        if newState and newState != self :
-                            newStates.append(newState)
-        return newStates
                         
     def load_from_file(self, file):
         with open(file, 'r') as f:
@@ -242,7 +232,6 @@ class JellyFieldState:
                     return False
         return True
             
-
 def play():
     jellyState = None
     while( not jellyState):
@@ -275,40 +264,20 @@ def play():
             print("You have lost!")
             break
 
-class TreeNode:
-    def __init__(self, state, parent=None):
-        self.state = state
-        self.parent = parent
-        self.children = []
-
-    def add_child(self, child_node):
-        self.children.append(child_node)
-        child_node.parent = self
-        
-def bfs_search(initialState):
-    root = TreeNode(initialState)
-    queue = deque([root])
-    while queue:
-        node = queue.popleft()
-        if(node.state.isGoal()):
-            return node
-        for state in node.state.get_next_states():
-            child = TreeNode(state)
-            node.add_child(child)
-            queue.append(child)
-    return None
+def play_ai():
+    jellyState = None
+    while( not jellyState):
+        file = input("Enter the file name: ")
+        try:
+            jellyState = JellyFieldState(file)
+        except Exception as e:
+            print(f"Error loading file: {e}")
+            jellyState = None
+    print("Initial Board State:")
     
-def print_solution(node):
+    jellyState.printBoard()
+    gajo = ai.AIAgent(jellyState)
+    solution = gajo.bfs_search()
+    gajo.print_solution(solution)
 
-    while (node.parent):
-        node.state.printBoard()
-        node = node.parent
-    node.state.printBoard()
-
-    return   
-play()
-
-jellyState = JellyFieldState("init.txt")
-
-newState = bfs_search(jellyState)
-print_solution(newState)
+play_ai()
