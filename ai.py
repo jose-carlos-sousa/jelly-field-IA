@@ -34,16 +34,16 @@ class AIAgent:
 
         return states
     
-    def depth_first_search(self, goal_state_func, operators_func):
+    def depth_first_search(self):
         root = TreeNode(self.initial_state)
         stack = [root]
         visited = [root]
 
         while stack:
             node = stack.pop()
-            if goal_state_func(node.state):
+            if self.goal_state(node.state):
                 return node
-            for state in operators_func(node.state):
+            for state in self.get_child_states(node.state):
                 if state not in visited:
                     visited.append(state)
                     new_state = TreeNode(state)
@@ -52,16 +52,27 @@ class AIAgent:
 
         return None
 
+    def bfs_search(self):
+        root = TreeNode(self.initial_state)
+        queue = deque([root])
+        while queue:
+            node = queue.popleft()
+            if(node.state.isGoal()):
+                return node
+            for state in node.state.get_next_states():
+                child = TreeNode(state)
+                node.add_child(child)
+                queue.append(child)
+        return None
+    
     def print_solution(self, node):
-        solution = []
-        while node:
-            solution.append(node.state)
-            node = node.parent
 
-        if len(solution) == 0:
-            print("No solution found!")
-        else:
-            print(f"Found solution in {len(solution) - 1} steps:")
-            for state in reversed(solution):
-                print(state)
-        return
+        steps = 0
+        while (node.parent):
+            #node.state.printBoard()
+            steps += 1
+            node = node.parent
+        #node.state.printBoard()
+        print(f"Solution found in {steps} steps\n")
+        return  
+

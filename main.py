@@ -1,5 +1,6 @@
 import pygameGUI, time, ai
 import copy
+from collections import deque
 #For convertion E means empty space, N means Non playable space
 class Jelly:
     def __init__(self, array, type = "normal"):
@@ -64,7 +65,19 @@ class JellyFieldState:
             self.goal = {}
             self.colors = {}
         self.score = 0
-
+    def get_next_states(self):
+        newStates = []
+        for i in range(self.c1):
+            for j in range(self.c2):
+                if self.board[i][j].type == "empty":
+                    for seqNum in range(2):
+                        newState = copy.deepcopy(self)
+                        newState.move(seqNum, i, j)
+                        newState.collapse()
+                        if newState and newState != self :
+                            newStates.append(newState)
+        return newStates
+                        
     def load_from_file(self, file):
         with open(file, 'r') as f:
             lines = f.readlines()
@@ -154,12 +167,11 @@ class JellyFieldState:
             oldBoard = copy.deepcopy(self.board)
             for i in range(self.c1):
                 for j in range(self.c2):
-                    print(f"Checking {i},{j}")
                     neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
                     globalCollisionColors = set()
                     for ni, nj in neighbors:
                         if 0 <= ni < self.c1 and 0 <= nj < self.c2:
-                            print(f"Checking neighbor {ni},{nj}")
+                    
                             if ni == i - 1:
                                 direction = 'up'
                             elif ni == i + 1:
@@ -235,7 +247,6 @@ class JellyFieldState:
                     return False
         return True
             
-            
 def play():
     jellyState = None
     while( not jellyState):
@@ -268,7 +279,6 @@ def play():
             print("You have lost!")
             break
 
-
 def play_ai():
     jellyState = None
     while( not jellyState):
@@ -281,9 +291,8 @@ def play_ai():
     print("Initial Board State:")
     
     jellyState.printBoard()
-    agent = ai.AIAgent(jellyState)
-    goal = agent.depth_first_search(agent.goal_state, agent.get_child_states)
-    agent.print_solution(goal)
+    gajo = ai.AIAgent(jellyState)
+    solution = gajo.bfs_search()
+    gajo.print_solution(solution)
 
-#play()
 play_ai()
