@@ -59,7 +59,7 @@ class AIAgent:
             node = queue.popleft()
             if(node.state.isGoal()):
                 return node
-            for state in node.state.get_next_states():
+            for state in self.get_child_states(node.state):
                 child = TreeNode(state)
                 node.add_child(child)
                 queue.append(child)

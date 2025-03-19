@@ -65,18 +65,6 @@ class JellyFieldState:
             self.goal = {}
             self.colors = {}
         self.score = 0
-    def get_next_states(self):
-        newStates = []
-        for i in range(self.c1):
-            for j in range(self.c2):
-                if self.board[i][j].type == "empty":
-                    for seqNum in range(2):
-                        newState = copy.deepcopy(self)
-                        newState.move(seqNum, i, j)
-                        newState.collapse()
-                        if newState and newState != self :
-                            newStates.append(newState)
-        return newStates
                         
     def load_from_file(self, file):
         with open(file, 'r') as f:
@@ -292,7 +280,7 @@ def play_ai():
     
     jellyState.printBoard()
     gajo = ai.AIAgent(jellyState)
-    solution = gajo.bfs_search()
+    solution = gajo.depth_first_search()
     gajo.print_solution(solution)
 
 play_ai()
