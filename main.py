@@ -35,7 +35,9 @@ class Jelly:
             self.type = "empty"
 
     def is_empty(self):
-        return self.type == "empty"              
+        return self.type == "empty"           
+    def is_na(self):
+        return self.type == "na"   
 
     def erase(self, color):
         for i in range(2):
@@ -277,7 +279,7 @@ def play_ai():
     
     jellyState.printBoard()
     gajo = ai.AIAgent(jellyState)
-    solution = gajo.bfs_search()
+    solution = gajo.a_star_search(gajo.heuristic_non_empty_jellies, 0.7)
     gajo.print_solution(solution)
 
 play_ai()
