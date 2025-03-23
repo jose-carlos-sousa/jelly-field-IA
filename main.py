@@ -258,7 +258,7 @@ class JellyFieldState:
                     return False
         return True
             
-def play():
+def play_human():
     jellyState = None
     while( not jellyState):
         file = input("Enter the file name: ")
@@ -303,7 +303,45 @@ def play_ai():
     
     jellyState.printBoard()
     gajo = ai.AIAgent(jellyState)
-    solution = gajo.a_star_search(gajo.heuristic_non_empty_jellies, 0.7)
+    print("which search do you want to use?")
+    print("1. Depth First Search")
+    print("2. Breadth First Search")
+    print("3. A* Search")
+    search = input("Enter the search number: ")
+    if search == "1":
+        solution = gajo.depth_first_search()
+    elif search == "2":
+        solution = gajo.bfs_search()
+    elif search == "3":
+        print("Select a heuristic:")
+        print("1. Number of non-empty jellies")
+        print("2. Goal values")
+        heuristic = input("Enter the heuristic number: ")
+        if heuristic == "1":
+            weight = input("Enter the weight: ")
+            solution = gajo.a_star_search(gajo.heuristic_non_empty_jellies, float(weight))
+        elif heuristic == "2":
+            weight = input("Enter the weight: ")
+            solution = gajo.a_star_search(gajo.heuristic_goal_vals, float(weight))
+        else:
+            print("Invalid heuristic. Please enter 1 or 2.")
+            play_ai()
+    if not solution:
+        print("No solution found.")
+        return
     gajo.print_solution(solution)
 
+def play():
+    print("Welcome to Jelly Crush!")
+    print("Select a mode:")
+    print("1. Human")
+    print("2. AI")
+    mode = input("Enter the mode number: ")
+    if mode == "1":
+        play_human()
+    elif mode == "2":
+        play_ai()
+    else:
+        print("Invalid mode. Please enter 1 or 2.")
+        play()
 play()
