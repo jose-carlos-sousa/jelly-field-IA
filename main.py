@@ -17,7 +17,7 @@ class InfiniteArray:
             if(index == 1):
                 self.cur = self.cur + self.arr.copy()
             else:
-                self.cur = self.arr.copy()[0] + self.cur + self.arr.copy()[1:]
+                self.cur = [self.arr.copy()[0]] + self.cur + self.arr.copy()[1:]
             
     def __getitem__(self, index):
         return self.cur[index]
