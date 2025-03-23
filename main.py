@@ -2,6 +2,30 @@ import pygameGUI, time, ai
 import copy
 from collections import deque
 #For convertion E means empty space, N means Non playable space
+class InfiniteArray:
+    def __init__(self, arr):
+        self.arr = arr.copy()
+        self.cur = arr.copy()
+        
+    def append(self, value):
+        self.cur.append(value)
+        self.arr.append(copy.deepcopy(value))
+        
+    def pop(self, index=-1):
+        self.cur.pop(index)
+        if len(self.cur) <= 1:
+            if(index == 1):
+                self.cur = self.cur + self.arr.copy()
+            else:
+                self.cur = self.arr.copy()[0] + self.cur + self.arr.copy()[1:]
+            
+    def __getitem__(self, index):
+        return self.cur[index]
+
+    def __len__(self):
+        return len(self.cur)
+        
+    
 class Jelly:
     def __init__(self, array, type = "normal"):
         if len(array) != 2 or any(len(row) != 2 for row in array):
@@ -63,7 +87,7 @@ class JellyFieldState:
             self.c1 = 0
             self.c2 = 0
             self.board = []
-            self.next_jellies = []
+            self.next_jellies = InfiniteArray([])
             self.goal = {}
             self.colors = {}
         self.score = 0
@@ -119,7 +143,7 @@ class JellyFieldState:
                 self.c2 = len(self.board[0])
 
         # Parse sequence
-        self.next_jellies = []
+        self.next_jellies = InfiniteArray([])
         if lines[i].strip() == "//DEF SEQ":
             i += 1
             while i < len(lines):
@@ -211,7 +235,7 @@ class JellyFieldState:
                 print()
         print()
         print("Next Jellies:")
-        for jelly in self.next_jellies:
+        for jelly in self.next_jellies.cur:
             for i in range(2):
                 print("".join(jelly.array[i]))
             print()
@@ -282,4 +306,4 @@ def play_ai():
     solution = gajo.a_star_search(gajo.heuristic_non_empty_jellies, 0.7)
     gajo.print_solution(solution)
 
-play_ai()
+play()
