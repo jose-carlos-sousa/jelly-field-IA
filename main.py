@@ -2,6 +2,30 @@ import pygameGUI, time, ai
 import copy
 from collections import deque
 #For convertion E means empty space, N means Non playable space
+class InfiniteArray:
+    def __init__(self, arr):
+        self.arr = arr.copy()
+        self.cur = arr.copy()
+        
+    def append(self, value):
+        self.cur.append(value)
+        self.arr.append(copy.deepcopy(value))
+        
+    def pop(self, index=-1):
+        self.cur.pop(index)
+        if len(self.cur) <= 1:
+            if(index == 1):
+                self.cur = self.cur + self.arr.copy()
+            else:
+                self.cur = [self.arr.copy()[0]] + self.cur + self.arr.copy()[1:]
+            
+    def __getitem__(self, index):
+        return self.cur[index]
+
+    def __len__(self):
+        return len(self.cur)
+        
+    
 class Jelly:
     def __init__(self, array, type = "normal"):
         if len(array) != 2 or any(len(row) != 2 for row in array):
@@ -35,7 +59,9 @@ class Jelly:
             self.type = "empty"
 
     def is_empty(self):
-        return self.type == "empty"              
+        return self.type == "empty"           
+    def is_na(self):
+        return self.type == "na"   
 
     def erase(self, color):
         for i in range(2):
@@ -61,7 +87,7 @@ class JellyFieldState:
             self.c1 = 0
             self.c2 = 0
             self.board = []
-            self.next_jellies = []
+            self.next_jellies = InfiniteArray([])
             self.goal = {}
             self.colors = {}
         self.score = 0
@@ -117,7 +143,7 @@ class JellyFieldState:
                 self.c2 = len(self.board[0])
 
         # Parse sequence
-        self.next_jellies = []
+        self.next_jellies = InfiniteArray([])
         if lines[i].strip() == "//DEF SEQ":
             i += 1
             while i < len(lines):
@@ -209,7 +235,7 @@ class JellyFieldState:
                 print()
         print()
         print("Next Jellies:")
-        for jelly in self.next_jellies:
+        for jelly in self.next_jellies.cur:
             for i in range(2):
                 print("".join(jelly.array[i]))
             print()
@@ -219,6 +245,12 @@ class JellyFieldState:
             print(f"{color}: {goal}")
         print()
     
+    def isGoal(self):
+        for _, goal in self.goal.items():
+            if goal != 0:
+                return False
+        return True
+        
     def isBoardFull(self):
         for row in self.board:
             for jelly in row:
@@ -226,7 +258,7 @@ class JellyFieldState:
                     return False
         return True
             
-def play():
+def play_human():
     jellyState = None
     while( not jellyState):
         file = input("Enter the file name: ")
@@ -271,7 +303,48 @@ def play_ai():
     
     jellyState.printBoard()
     gajo = ai.AIAgent(jellyState)
-    solution = gajo.iterative_deepening()
+    print("which search do you want to use?")
+    print("1. Depth First Search")
+    print("2. Breadth First Search")
+    print("3. A* Search")
+    print("4. Iterative Deepening")
+    search = input("Enter the search number: ")
+    if search == "1":
+        solution = gajo.depth_first_search()
+    elif search == "2":
+        solution = gajo.bfs_search()
+    elif search == "3":
+        print("Select a heuristic:")
+        print("1. Number of non-empty jellies")
+        print("2. Goal values")
+        heuristic = input("Enter the heuristic number: ")
+        if heuristic == "1":
+            weight = input("Enter the weight: ")
+            solution = gajo.a_star_search(gajo.heuristic_non_empty_jellies, float(weight))
+        elif heuristic == "2":
+            weight = input("Enter the weight: ")
+            solution = gajo.a_star_search(gajo.heuristic_goal_vals, float(weight))
+        else:
+            print("Invalid heuristic. Please enter 1 or 2.")
+            play_ai()
+    elif search == "4":
+        solution = gajo.iterative_deepening()
+    if not solution:
+        print("No solution found.")
+        return
     gajo.print_solution(solution)
 
-play_ai()
+def play():
+    print("Welcome to Jelly Crush!")
+    print("Select a mode:")
+    print("1. Human")
+    print("2. AI")
+    mode = input("Enter the mode number: ")
+    if mode == "1":
+        play_human()
+    elif mode == "2":
+        play_ai()
+    else:
+        print("Invalid mode. Please enter 1 or 2.")
+        play()
+play()

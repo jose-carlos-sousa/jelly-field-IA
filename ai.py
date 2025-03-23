@@ -1,5 +1,6 @@
 from collections import deque
 import copy
+import heapq
 
 class TreeNode:
     def __init__(self, state, parent=None):
@@ -12,6 +13,9 @@ class TreeNode:
         self.children.append(child_node)
         child_node.parent = self
         child_node.depth = self.depth + 1
+
+    def __lt__(self, other):
+        return False  # or any other logic to compare TreeNode instances
 
 class AIAgent:
     def __init__(self, state):
@@ -90,6 +94,30 @@ class AIAgent:
 
         return None
 
+    def heuristic_goal_vals(self, state):
+        return sum(state.goal.values())
+    def heuristic_non_empty_jellies(self, state):
+        return len([jelly for row in state.board for jelly in row if (not jelly.is_empty() and not jelly.is_na())])
+    
+    def a_star_search(self, heuristic, weight=1):
+        root = TreeNode(self.initial_state)
+        queue = [(0, root)]
+        
+        visited = set()
+        while queue:
+            _, node = heapq.heappop(queue)
+            if self.goal_state(node.state):
+                return node
+            visited.add(node.state)
+            for state in self.get_child_states(node.state):
+                if state not in visited:
+                    visited.add(state)
+                    child = TreeNode(state)
+                    node.add_child(child)
+                    cost = node.depth + weight * heuristic(state)
+                    heapq.heappush(queue, (cost, child))
+        return None
+    
     def print_solution(self, node):
 
         steps = 0
@@ -98,8 +126,10 @@ class AIAgent:
             return
 
         while (node.parent):
+            node.state.printBoard()
             steps += 1
             node = node.parent
+            
    
         print(f"Solution found in {steps} steps\n")
         return  
