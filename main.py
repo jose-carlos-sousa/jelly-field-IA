@@ -250,7 +250,7 @@ class JellyFieldState:
             if goal != 0:
                 return False
         return True
-    
+        
     def isBoardFull(self):
         for row in self.board:
             for jelly in row:
@@ -307,6 +307,7 @@ def play_ai():
     print("1. Depth First Search")
     print("2. Breadth First Search")
     print("3. A* Search")
+    print("4. Iterative Deepening")
     search = input("Enter the search number: ")
     if search == "1":
         solution = gajo.depth_first_search()
@@ -326,6 +327,8 @@ def play_ai():
         else:
             print("Invalid heuristic. Please enter 1 or 2.")
             play_ai()
+    elif search == "4":
+        solution = gajo.iterative_deepening()
     if not solution:
         print("No solution found.")
         return

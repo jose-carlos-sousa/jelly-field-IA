@@ -72,6 +72,28 @@ class AIAgent:
                     queue.append(child)
         return None
     
+    def iterative_deepening(self, max_depth=10):
+        depth = 1
+        while depth < max_depth:
+            node = TreeNode(self.initial_state)
+            stack = [node]
+            visited = [node]
+
+            while stack:
+                node = stack.pop()
+                if self.goal_state(node.state):
+                    return node
+                for state in self.get_child_states(node.state):
+                    if state not in visited and node.depth < depth:
+                        visited.append(state)
+                        new_state = TreeNode(state)
+                        node.add_child(new_state)
+                        stack.append(new_state)
+            
+            depth += 1
+
+        return None
+
     def heuristic_goal_vals(self, state):
         return sum(state.goal.values())
     def heuristic_non_empty_jellies(self, state):
