@@ -227,7 +227,8 @@ class JellyFieldState:
 
     def __str__(self):
         return f"Colors {self.colors} Board: {self.board}, Next Jellies: {self.next_jellies}, Goal: {self.goal}"
-    def printBoard(self): #depois fica a logica das cenas do ricardo aqui
+
+    def printBoard(self):
         for row in self.board:
             for i in range(2):
                 for jelly in row:
@@ -290,8 +291,13 @@ def play_human():
             print("You have lost!")
             break
 
+def save_game(solution_steps, solution_time, score, player_name, level):
+    with open('leaderboard.csv', 'a') as file:
+        file.write(f"{player_name},{solution_time:.2f},{score:.2f},{solution_steps},{level.split('.')[0]}\n")
+
 def play_ai():
     jellyState = None
+    player_name = ""
     while( not jellyState):
         file = input("Enter the file name: ")
         try:
@@ -300,7 +306,7 @@ def play_ai():
             print(f"Error loading file: {e}")
             jellyState = None
     print("Initial Board State:")
-    
+    board_size = len(jellyState.board) * len(jellyState.board[0])
     jellyState.printBoard()
     gajo = ai.AIAgent(jellyState)
     print("which search do you want to use?")
@@ -310,29 +316,46 @@ def play_ai():
     print("4. Iterative Deepening")
     search = input("Enter the search number: ")
     if search == "1":
+        player_name = "DFS"
+        start = time.time()
         solution = gajo.depth_first_search()
+        solution_time = time.time() - start
     elif search == "2":
+        player_name = "BFS"
+        start = time.time()
         solution = gajo.bfs_search()
+        solution_time = time.time() - start
     elif search == "3":
         print("Select a heuristic:")
         print("1. Number of non-empty jellies")
         print("2. Goal values")
         heuristic = input("Enter the heuristic number: ")
         if heuristic == "1":
+            player_name = "A* Non-Empty Search"
             weight = input("Enter the weight: ")
+            start = time.time()
             solution = gajo.a_star_search(gajo.heuristic_non_empty_jellies, float(weight))
+            solution_time = time.time() - start
         elif heuristic == "2":
+            player_name = "A* Goal Values"
             weight = input("Enter the weight: ")
+            start = time.time()
             solution = gajo.a_star_search(gajo.heuristic_goal_vals, float(weight))
+            solution_time = time.time() - start
         else:
             print("Invalid heuristic. Please enter 1 or 2.")
             play_ai()
     elif search == "4":
+        player_name = "Iterative Deepening"
+        start = time.time()
         solution = gajo.iterative_deepening()
+        solution_time = time.time() - start
     if not solution:
         print("No solution found.")
         return
-    gajo.print_solution(solution)
+    solution_steps = gajo.print_solution(solution)
+    score = (2 * board_size) / (solution_steps + 1) * ((solution_time * 1000) + 1000)
+    save_game(solution_steps, solution_time, score, player_name, file)
 
 def play():
     print("Welcome to Jelly Crush!")

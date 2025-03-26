@@ -119,7 +119,6 @@ class AIAgent:
         return None
     
     def print_solution(self, node):
-
         steps = 0
         if (not node):
             print("NO SOLUTION FOUND MENDES!")
@@ -132,5 +131,5 @@ class AIAgent:
             
    
         print(f"Solution found in {steps} steps\n")
-        return  
+        return steps
 
