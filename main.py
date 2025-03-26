@@ -272,15 +272,19 @@ def play_human():
             jellyState = None
     print("Initial Board State:")
     
+    board_size = len(jellyState.board) * len(jellyState.board[0])
     jellyState.printBoard()
     
     gui = pygameGUI.pygameGUI(jellyState, leaderboard)
     end = False
-    
+    start = time.time()
+    steps = 0
+
     while not end:
         move, seqNum, x, y = gui.handle_events(jellyState)
         gui.display(jellyState)
         if move:
+            steps += 1
             jellyState.move(seqNum, x, y)
             jellyState.collapse()
         if jellyState.isGoal():
@@ -292,6 +296,10 @@ def play_human():
             end = True
             print("You have lost!")
             break
+    
+    solution_time = time.time() - start
+    score = (1000 * board_size) / (steps + solution_time)
+    save_game(steps, solution_time, score, "Human", file.split('.')[0])
 
 def save_game(solution_steps, solution_time, score, player_name, level):
     with open('leaderboard.csv', 'a') as file:
@@ -300,7 +308,7 @@ def save_game(solution_steps, solution_time, score, player_name, level):
 def load_leaderboard():
     df = pd.read_csv('leaderboard.csv')
     df.set_index('Player')
-    df.sort_values('Score', ascending=True, inplace=True)
+    df.sort_values('Score', ascending=False, inplace=True)
     return df
 
 def play_ai():
@@ -362,7 +370,7 @@ def play_ai():
         print("No solution found.")
         return
     solution_steps = gajo.print_solution(solution)
-    score = (2 * board_size) / (solution_steps + 1) * ((solution_time * 1000) + 1000)
+    score = (1000 * board_size) / (solution_steps + solution_time)
     save_game(solution_steps, solution_time, score, player_name, file)
 
 def play():

@@ -85,10 +85,12 @@ class pygameGUI:
         self.screen.blit(title_surface, ((1280 - title_surface.get_width()) // 2, 20))
         
         y_offset = 80
+        pos = 1
         for index, row in self.leaderboard.iterrows():
-            text_surface = self.font.render(f"{index + 1}. {row['Player']} - {row['Score']}", True, (255, 255, 255))
+            text_surface = self.font.render(f"{pos}. {row['Player']} - {row['Score']}", True, (255, 255, 255))
             self.screen.blit(text_surface, (50, y_offset))
             y_offset += 40
+            pos += 1
 
         pygame.display.flip()
 
