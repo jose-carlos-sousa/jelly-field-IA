@@ -82,6 +82,7 @@ class pygameGUI:
         menu_button_rect = menu_button.get_rect(topleft=(10, 10))
         self.screen.blit(menu_button, menu_button_rect)
         self.buttons["Main Menu"] = menu_button_rect
+        #print(move)
 
         self.draw_goals(state)
         
@@ -93,10 +94,19 @@ class pygameGUI:
         self.draw_board(state)
 
         self.draw_next_jellies(state)
+        
+        self.draw_helper(state, 10, 650)
                 
         pygame.display.flip()
+        
+    def draw_helper(self, state, x, y):
+        move = state.get_next_best_move()
+        if move is not None:
+            text_surface = self.font.render(f"move  piece {move[2]} to col {move[1]} row {move[0]}", True, (255, 255, 255))
+            text_rect = text_surface.get_rect(topleft=(x, y))
+            self.screen.blit(text_surface, text_rect)
 
-
+  
     def handle_events(self, state):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

@@ -8,6 +8,10 @@ class TreeNode:
         self.parent = parent
         self.children = []
         self.depth = 0
+        self.move = []
+        
+    def add_move(self, move):
+        self.move = move  #Move is [x,y,seqNum]
 
     def add_child(self, child_node):
         self.children.append(child_node)
@@ -25,7 +29,7 @@ class AIAgent:
         return all(value == 0 for value in state.goal.values())
 
     def get_child_states(self, state):
-        states = []
+        stateDict = {}
         rows, cols = len(state.board), len(state.board[0])
         for row in range(rows):
             for col in range(cols):
@@ -34,9 +38,9 @@ class AIAgent:
                         jellyState = copy.deepcopy(state)
                         jellyState.move(seqNum, col, row)
                         jellyState.collapse()
-                        states.append(jellyState)
+                        stateDict[(row, col, seqNum)] = jellyState
 
-        return states
+        return stateDict
     
     def depth_first_search(self):
         root = TreeNode(self.initial_state)
@@ -47,10 +51,11 @@ class AIAgent:
             node = stack.pop()
             if self.goal_state(node.state):
                 return node
-            for state in self.get_child_states(node.state):
+            for moveArr, state in self.get_child_states(node.state).items():
                 if state not in visited:
                     visited.append(state)
                     new_state = TreeNode(state)
+                    new_state.add_move(moveArr)
                     node.add_child(new_state)
                     stack.append(new_state)
 
@@ -64,10 +69,11 @@ class AIAgent:
             node = queue.popleft()
             if self.goal_state(node.state):
                 return node
-            for state in self.get_child_states(node.state):
+            for moveArr, state in self.get_child_states(node.state).items():
                 if state not in visited:
                     visited.append(state)
                     child = TreeNode(state)
+                    child.add_move(moveArr)
                     node.add_child(child)
                     queue.append(child)
         return None
@@ -76,20 +82,23 @@ class AIAgent:
         depth = 1
         while depth < max_depth:
             node = TreeNode(self.initial_state)
+            print(f"initiating depth {node.depth}")
             stack = [node]
             visited = [node]
 
             while stack:
                 node = stack.pop()
+                print(f"Depth {node.depth}")
                 if self.goal_state(node.state):
                     return node
-                for state in self.get_child_states(node.state):
-                    if state not in visited and node.depth < depth:
+                for moveArr, state in self.get_child_states(node.state).items():
+                    if node.depth < depth:
                         visited.append(state)
                         new_state = TreeNode(state)
+                        new_state.add_move(moveArr)
                         node.add_child(new_state)
                         stack.append(new_state)
-            
+            print(f"Depth {depth} failed")
             depth += 1
 
         return None
@@ -109,10 +118,11 @@ class AIAgent:
             if self.goal_state(node.state):
                 return node
             visited.add(node.state)
-            for state in self.get_child_states(node.state):
+            for moveArr, state in self.get_child_states(node.state).items():
                 if state not in visited:
                     visited.add(state)
                     child = TreeNode(state)
+                    child.add_move(moveArr)
                     node.add_child(child)
                     cost = node.depth + weight * heuristic(state)
                     heapq.heappush(queue, (cost, child))
@@ -127,9 +137,10 @@ class AIAgent:
 
         while (node.parent):
             node.state.printBoard()
+            print(f"move {node.move}")
             steps += 1
             node = node.parent
-            
+        node.state.printBoard()
    
         print(f"Solution found in {steps} steps\n")
         return  

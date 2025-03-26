@@ -152,6 +152,7 @@ class JellyFieldState:
                     self.next_jellies.append(Jelly(jelly_array))
                     i += 2
                 i += 1
+                
     def checkCollision(self, jelly1, jelly2, direction):
         if jelly1.type == "na" or jelly2.type == "na":
             return None
@@ -257,9 +258,23 @@ class JellyFieldState:
                 if jelly.type == "empty":
                     return False
         return True
+    
+    def get_next_best_move(self):
+        aiAgent = ai.AIAgent(self)
+        node = aiAgent.a_star_search(aiAgent.heuristic_goal_vals, 1)
+        move = None
+        while (node.parent):
+            move = node.move
+            node = node.parent
+        print("move is ", move)
+        return move
+        
+        
+        
             
 def play_human():
     jellyState = None
+    playWithHints = input("Do you want to play with hints? (y/n): ")
     while( not jellyState):
         file = input("Enter the file name: ")
         try:
@@ -270,7 +285,6 @@ def play_human():
     print("Initial Board State:")
     
     jellyState.printBoard()
-    
     gui = pygameGUI.pygameGUI(jellyState)
     end = False
     
