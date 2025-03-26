@@ -1,7 +1,7 @@
 import pygame
 
 class pygameGUI:
-    def __init__(self, state):
+    def __init__(self, state, leaderboard):
         pygame.init()
         self.screen = pygame.display.set_mode((1280, 720))
         self.offset_x = 0
@@ -13,6 +13,7 @@ class pygameGUI:
         self.clock = pygame.time.Clock()
         self.dragging = False
         self.selected_jelly = None
+        self.leaderboard = leaderboard
         self.jelly_positions = {}
         for i in range(len(state.next_jellies)):
             self.jelly_positions[i] = pygame.Rect(((self.screen.get_width() - 2 * self.cell_size - 50) // 2) + i * (self.cell_size + 50), 
@@ -73,7 +74,23 @@ class pygameGUI:
         pass
     
     def display_leaderboard_screen(self):
-        pass
+        self.screen.fill((30, 30, 30))
+
+        menu_button = self.font.render("Main Menu", True, (255, 255, 255))
+        menu_button_rect = menu_button.get_rect(topleft=(10, 10))
+        self.screen.blit(menu_button, menu_button_rect)
+        self.buttons["Main Menu"] = menu_button_rect
+        
+        title_surface = self.font.render("Leaderboard", True, (255, 255, 255))
+        self.screen.blit(title_surface, ((1280 - title_surface.get_width()) // 2, 20))
+        
+        y_offset = 80
+        for index, row in self.leaderboard.iterrows():
+            text_surface = self.font.render(f"{index + 1}. {row['Player']} - {row['Score']}", True, (255, 255, 255))
+            self.screen.blit(text_surface, (50, y_offset))
+            y_offset += 40
+
+        pygame.display.flip()
 
     def display_game(self, state):
         self.screen.fill((0, 0, 0))
@@ -106,6 +123,8 @@ class pygameGUI:
                     if self.current_screen == "main_menu":
                         self.handle_main_menu_click(event.pos)
                     elif self.current_screen == "game_screen":
+                        self.handle_game_click(event.pos)
+                    elif self.current_screen == "leaderboard_screen":
                         self.handle_game_click(event.pos)
                 mouse_x, mouse_y = event.pos
                 

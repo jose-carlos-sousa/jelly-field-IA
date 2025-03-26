@@ -1,5 +1,6 @@
 import pygameGUI, time, ai
 import copy
+import pandas as pd
 from collections import deque
 #For convertion E means empty space, N means Non playable space
 class InfiniteArray:
@@ -260,6 +261,7 @@ class JellyFieldState:
         return True
             
 def play_human():
+    leaderboard = load_leaderboard()
     jellyState = None
     while( not jellyState):
         file = input("Enter the file name: ")
@@ -272,7 +274,7 @@ def play_human():
     
     jellyState.printBoard()
     
-    gui = pygameGUI.pygameGUI(jellyState)
+    gui = pygameGUI.pygameGUI(jellyState, leaderboard)
     end = False
     
     while not end:
@@ -294,6 +296,12 @@ def play_human():
 def save_game(solution_steps, solution_time, score, player_name, level):
     with open('leaderboard.csv', 'a') as file:
         file.write(f"{player_name},{solution_time:.2f},{score:.2f},{solution_steps},{level.split('.')[0]}\n")
+
+def load_leaderboard():
+    df = pd.read_csv('leaderboard.csv')
+    df.set_index('Player')
+    df.sort_values('Score', ascending=True, inplace=True)
+    return df
 
 def play_ai():
     jellyState = None
