@@ -97,7 +97,9 @@ class AIAgent:
     def heuristic_goal_vals(self, state):
         return sum(state.goal.values())
     def heuristic_non_empty_jellies(self, state):
-        return len([jelly for row in state.board for jelly in row if (not jelly.is_empty() and not jelly.is_na())])
+        return state.nonEmptyJellyCount
+    def heuristic_collapse_count(self, state):
+        return 1000 / (state.collapseCount + 1)
     
     def a_star_search(self, heuristic, weight=1):
         root = TreeNode(self.initial_state)
@@ -116,6 +118,33 @@ class AIAgent:
                     node.add_child(child)
                     cost = node.depth + weight * heuristic(state)
                     heapq.heappush(queue, (cost, child))
+        return None
+    
+    def greedy_search(self, heuristic):
+        stack = []
+        initial_node = TreeNode(self.initial_state)
+        stack.append(initial_node)
+        visited = set()
+
+        while stack:
+            node = stack.pop()
+            if self.goal_state(node.state):
+                return node
+
+            visited.add(node.state)
+            best_child = None
+            best_heuristic = float('inf')
+            for state in self.get_child_states(node.state):
+                if state not in visited:
+                    h_value = heuristic(state)
+                    if h_value < best_heuristic:
+                        best_heuristic = h_value
+                        best_child = TreeNode(state)
+            
+            if best_child:
+                node.add_child(best_child)
+                stack.append(best_child)
+
         return None
     
     def print_solution(self, node):

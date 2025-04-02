@@ -38,7 +38,7 @@ class Jelly:
             print("Invalid Jelly Type")
             return
         
-    def expand(self):
+    def expand(self, boardState):
         if self.type == "empty" or self.type == "na":
             return
         
@@ -82,6 +82,7 @@ class Jelly:
         self.array = new_board
         if all(cell == 'E' for row in self.array for cell in row):
             self.type = "empty"
+            boardState.nonEmptyJellyCount -= 1
 
     def is_empty(self):
         return self.type == "empty"           
@@ -106,7 +107,7 @@ class Jelly:
 class JellyFieldState:
     def __init__(self, file=None):
         if file:
-            print("Loading from file")
+            print("Loading from file...")
             self.load_from_file(file)
         else:
             self.c1 = 0
@@ -115,6 +116,8 @@ class JellyFieldState:
             self.next_jellies = InfiniteArray([])
             self.goal = {}
             self.colors = {}
+            self.nonEmptyJellyCount = 0
+            self.collapseCount = 0
         self.score = 0
                         
     def load_from_file(self, file):
@@ -139,7 +142,6 @@ class JellyFieldState:
             while not lines[i].startswith("//DEF BOARD\n"):
                 goal_def = lines[i].strip().split('=')
                 color_name = goal_def[0].strip()
-                print(goal_def)
                 goal_value = int(goal_def[1].strip())
                 self.goal[color_name] = goal_value
                 i += 1
@@ -177,6 +179,15 @@ class JellyFieldState:
                     self.next_jellies.append(Jelly(jelly_array))
                     i += 2
                 i += 1
+
+        self.nonEmptyJellyCount = 0
+        for row in range(self.c1):
+            for col in range(self.c2):
+                if self.board[row][col].type != "empty" and self.board[row][col].type != "na":
+                    self.nonEmptyJellyCount += 1
+
+        self.collapseCount = 0
+
     def checkCollision(self, jelly1, jelly2, direction):
         if jelly1.type == "na" or jelly2.type == "na":
             return None
@@ -228,14 +239,16 @@ class JellyFieldState:
                                         
                     for color in globalCollisionColors:
                         self.board[i][j].erase(color)
+                        self.collapseCount += 1
                         if (color in self.goal):
                             self.goal[color] = max(self.goal[color] - 1, 0)
-                        self.board[i][j].expand()
+                        self.board[i][j].expand(self)
         
                                 
     def move(self, seqNum, x, y):
         if ((self.board[y][x].type == "empty") and (seqNum == 0 or seqNum == 1)):
             self.board[y][x] = self.next_jellies[seqNum]
+            self.nonEmptyJellyCount += 1
             self.next_jellies.pop(seqNum)
         else :
             print("Invalid Jelly Move")
@@ -253,7 +266,7 @@ class JellyFieldState:
 
     def __str__(self):
         return f"Colors {self.colors} Board: {self.board}, Next Jellies: {self.next_jellies}, Goal: {self.goal}"
-    def printBoard(self): #depois fica a logica das cenas do ricardo aqui
+    def printBoard(self):
         for row in self.board:
             for i in range(2):
                 for jelly in row:
@@ -332,8 +345,9 @@ def play_ai():
     print("which search do you want to use?")
     print("1. Depth First Search")
     print("2. Breadth First Search")
-    print("3. A* Search")
-    print("4. Iterative Deepening")
+    print("3. Greedy Search")
+    print("4. A* Search")
+    print("5. Iterative Deepening")
     search = input("Enter the search number: ")
     if search == "1":
         solution = gajo.depth_first_search()
@@ -343,6 +357,22 @@ def play_ai():
         print("Select a heuristic:")
         print("1. Number of non-empty jellies")
         print("2. Goal values")
+        print("3. Collapse count")
+        heuristic = input("Enter the heuristic number: ")
+        if heuristic == "1":
+            solution = gajo.greedy_search(gajo.heuristic_non_empty_jellies)
+        elif heuristic == "2":
+            solution = gajo.greedy_search(gajo.heuristic_goal_vals)
+        elif heuristic == "3":
+            solution = gajo.greedy_search(gajo.heuristic_collapse_count)
+        else:
+            print("Invalid heuristic. Please enter 1, 2, or 3.")
+            play_ai()
+    elif search == "4":
+        print("Select a heuristic:")
+        print("1. Number of non-empty jellies")
+        print("2. Goal values")
+        print("3. Collapse count")
         heuristic = input("Enter the heuristic number: ")
         if heuristic == "1":
             weight = input("Enter the weight: ")
@@ -350,10 +380,13 @@ def play_ai():
         elif heuristic == "2":
             weight = input("Enter the weight: ")
             solution = gajo.a_star_search(gajo.heuristic_goal_vals, float(weight))
+        elif heuristic == "3":
+            weight = input("Enter the weight: ")
+            solution = gajo.a_star_search(gajo.heuristic_collapse_count, float(weight))
         else:
-            print("Invalid heuristic. Please enter 1 or 2.")
+            print("Invalid heuristic. Please enter 1, 2, or 3.")
             play_ai()
-    elif search == "4":
+    elif search == "5":
         solution = gajo.iterative_deepening()
     if not solution:
         print("No solution found.")
