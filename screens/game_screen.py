@@ -128,8 +128,10 @@ class GameScreen(Screen):
                     state.stats['time'] = time.time() - state.stats['time']
                     board_size = len(state.board) * len(state.board[0])
                     state.stats['score'] = round((1000 * board_size) / (state.stats['steps'] + state.stats['time']), 2)
+                    self.display(state)
                     return "victory", state
                 elif state.isBoardFull():
+                    self.display(state)
                     return "defeat", state
                 else:
                     return "game_screen", state
