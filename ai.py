@@ -1,5 +1,5 @@
 from collections import deque
-import copy
+import copy, time
 import heapq
 
 class TreeNode:
@@ -20,6 +20,7 @@ class TreeNode:
 class AIAgent:
     def __init__(self, state):
         self.initial_state = state
+        self.time = 0
 
     def goal_state(self, state):
         return all(value == 0 for value in state.goal.values())
@@ -39,6 +40,7 @@ class AIAgent:
         return states
     
     def depth_first_search(self):
+        start = time.time()
         root = TreeNode(self.initial_state)
         stack = [root]
         visited = [root]
@@ -46,6 +48,7 @@ class AIAgent:
         while stack:
             node = stack.pop()
             if self.goal_state(node.state):
+                self.time = time.time() - start
                 return node
             for state in self.get_child_states(node.state):
                 if state not in visited:
@@ -54,6 +57,7 @@ class AIAgent:
                     node.add_child(new_state)
                     stack.append(new_state)
 
+        self.time = time.time() - start
         return None
 
     def bfs_search(self):
@@ -118,18 +122,17 @@ class AIAgent:
                     heapq.heappush(queue, (cost, child))
         return None
     
-    def print_solution(self, node):
+    def get_solution_stats(self, node):
         steps = 0
         if (not node):
-            print("NO SOLUTION FOUND MENDES!")
-            return
+            return None
 
         while (node.parent):
-            node.state.printBoard()
             steps += 1
             node = node.parent
             
-   
-        print(f"Solution found in {steps} steps\n")
-        return steps
+        board_size = len(node.state.board) * len(node.state.board[0])
+
+        score = (1000 * board_size) / (steps + self.time)
+        return round(score, 2), steps, self.time
 

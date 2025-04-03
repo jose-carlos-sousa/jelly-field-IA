@@ -11,11 +11,11 @@ class AIGame(Screen):
 
     def run_game(self, state):
         if state.player == "Depth-First Search AI":
-            start = time.time()
             solution = self.gajo.depth_first_search()
-            solution_time = time.time() - start
 
-        return {'time': solution_time, 'level': state.stats['level'], 'player': state.player, 'score': 0, 'steps': 0}
+        score, steps, solution_time = self.gajo.get_solution_stats(solution)
+
+        return {'time': solution_time, 'level': state.stats['level'], 'player': state.player, 'score': score, 'steps': steps}
 
     def save_game(self, stats):
         with open('leaderboard.csv', 'a') as file:

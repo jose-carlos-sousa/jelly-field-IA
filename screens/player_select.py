@@ -1,4 +1,4 @@
-import pygame
+import pygame, time
 from screens.screen import Screen
 
 class PlayerSelect(Screen):
@@ -24,7 +24,8 @@ class PlayerSelect(Screen):
                         if button_text == "Main Menu":
                             return "main_menu", state
                         if button_text == "Human":
-                            state.player = "human"
+                            state.player = "Human"
+                            state.stats['time'] = time.time()
                             return "game_screen", state
                         elif button_text == "Depth-First Search AI":
                             state.player = "Depth-First Search AI"

@@ -1,4 +1,4 @@
-import pygame
+import pygame, time
 from screens.screen import Screen
 
 class GameScreen(Screen):
@@ -121,9 +121,13 @@ class GameScreen(Screen):
                                             self.cell_size, self.cell_size)
             
             if 0 <= row < len(state.board) and 0 <= col < len(state.board[0]):
+                state.stats['steps'] += 1
                 state.move(selected_jelly, col, row)
                 state.collapse()
                 if state.isGoal():
+                    state.stats['time'] = time.time() - state.stats['time']
+                    board_size = len(state.board) * len(state.board[0])
+                    state.stats['score'] = round((1000 * board_size) / (state.stats['steps'] + state.stats['time']), 2)
                     return "victory", state
                 elif state.isBoardFull():
                     return "defeat", state
