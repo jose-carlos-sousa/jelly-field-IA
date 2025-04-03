@@ -81,7 +81,6 @@ class Jelly:
 class JellyFieldState:
     def __init__(self, file=None):
         if file:
-            print("Loading from file")
             self.load_from_file(file)
         else:
             self.c1 = 0
@@ -347,4 +346,3 @@ def play():
     else:
         print("Invalid mode. Please enter 1 or 2.")
         play()
-play()
