@@ -124,7 +124,9 @@ class GameScreen(Screen):
                 state.move(selected_jelly, col, row)
                 state.collapse()
                 if state.isGoal():
-                    return "main_menu", state
+                    return "victory", state
+                elif state.isBoardFull():
+                    return "defeat", state
                 else:
                     return "game_screen", state
             

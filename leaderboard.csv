@@ -2,3 +2,5 @@ Player,Time,Score,Moves,Level
 A* Non-Empty Search,0.82,2045.22,7,mendes
 BFS,0.02,1325.82,3,init
 DFS,0.01,1330.19,3,init
+Depth-First Search AI,0.0035772323608398438,0,0,init
+Depth-First Search AI,0.0032291412353515625,0,0,init

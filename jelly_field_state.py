@@ -83,7 +83,6 @@ class Jelly:
 class JellyFieldState:
     def __init__(self, file=None):
         if file:
-            print("Loading from file")
             self.load_from_file(file)
         else:
             self.c1 = 0
@@ -92,7 +91,8 @@ class JellyFieldState:
             self.next_jellies = InfiniteArray([])
             self.goal = {}
             self.colors = {}
-        self.score = 0
+        self.stats = {'time': 0, 'steps': 0, 'level': "", 'player': "", 'score': 0}
+        self.player = None
                         
     def load_from_file(self, file):
         with open(file, 'r') as f:
@@ -116,7 +116,6 @@ class JellyFieldState:
             while not lines[i].startswith("//DEF BOARD\n"):
                 goal_def = lines[i].strip().split('=')
                 color_name = goal_def[0].strip()
-                print(goal_def)
                 goal_value = int(goal_def[1].strip())
                 self.goal[color_name] = goal_value
                 i += 1
