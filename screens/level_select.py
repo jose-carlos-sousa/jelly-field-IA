@@ -8,18 +8,20 @@ class LevelSelect(Screen):
         super().__init__()
         self.levels = [s.split('.')[0] for s in os.listdir(os.path.join(os.getcwd(), 'levels'))]
         self.selected = 0
+        self.add_text_button("Main Menu", "medium_bold", (50, 50), alignment="left")
         self.add_text_button("Previous", "large", (200, self.height // 2))
         self.add_text_button("Next", "large", (self.width - 200, self.height // 2))
         self.add_text_button("Select", "large", (self.width // 2, self.height - 50))
 
     def display(self, state):
-        self.surface.fill((0, 0, 0))
+        self.surface.blit(self.bg, (0, 0))
         self.draw_text("Select Level", "large_bold", (self.width // 2, 50))
+        self.draw_button("Main Menu", "medium_bold", (50, 50), alignment="left")
         
-        self.draw_text("Previous", "large", (200, self.height // 2))
-        self.draw_text("Next", "large", (self.width - 200, self.height // 2))
+        self.draw_button("Previous", "large", (200, self.height // 2))
+        self.draw_button("Next", "large", (self.width - 200, self.height // 2))
 
-        self.draw_text("Select", "large", (self.width // 2, self.height - 50))
+        self.draw_button("Select", "large", (self.width // 2, self.height - 50))
 
         self.draw_text(self.levels[self.selected], "large_bold", (self.width // 2, self.height // 2))
 
@@ -33,6 +35,8 @@ class LevelSelect(Screen):
                             self.selected = (self.selected - 1) % len(self.levels)
                         elif button_text == "Next":
                             self.selected = (self.selected - 1) % len(self.levels)
+                        elif button_text == "Main Menu":
+                            return "main_menu", state
                         elif button_text == "Select":
                             file = os.path.join('.', 'levels', '.'.join([self.levels[self.selected], 'txt']))
                             new_state = JellyFieldState(file)

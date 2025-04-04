@@ -8,16 +8,16 @@ class MainMenuScreen(Screen):
         self.start_y = int(self.height / 2)
 
         for index, button_text in enumerate(self.button_texts):
-            self.add_text_button(button_text, "large_bold", (self.width // 2, self.start_y + index * 80))
+            self.add_text_button(button_text, "large_bold", (self.width // 2, self.start_y + index * 100))
 
 
     def display(self, state):
-        self.surface.fill((0, 0, 0))
+        self.surface.blit(self.bg, (0, 0))
         self.draw_text("Jelly Field Puzzle", "large_bold", (self.width // 2, 100))
         
         for index, text in enumerate(self.button_texts):
-            position = (self.width // 2, self.start_y + index * 80)
-            self.draw_text(text, "large_bold", position)
+            position = (self.width // 2, self.start_y + index * 100)
+            self.draw_button(text, "large_bold", position)
     
         pygame.display.flip()
 

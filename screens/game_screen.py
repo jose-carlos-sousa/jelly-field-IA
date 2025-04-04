@@ -9,7 +9,7 @@ class GameScreen(Screen):
         self.cell_size = 50
         self.dragging = False
         self.selected_jelly = None
-        self.add_text_button("Main Menu", "medium_bold", (150, 50))
+        self.add_text_button("Main Menu", "medium_bold", (50, 50), alignment="left")
 
         self.jelly_positions = {}
         for i in range(len(state.next_jellies)):
@@ -63,14 +63,14 @@ class GameScreen(Screen):
     def display(self, state):
         current_time = round(time.time() - state.stats['time'])
 
-        self.surface.fill((0, 0, 0))
+        self.surface.blit(self.bg, (0, 0))
         
-        self.draw_text("Main Menu", "large_bold", (150, 50))
+        self.draw_button("Main Menu", "medium_bold", (50, 50), alignment="left")
 
         self.draw_goals(state)
         
-        self.draw_text(f"Moves: {state.stats['steps']}", "medium_bold", (self.width - 150, 50))
-        self.draw_text(f"Time: {(current_time // 60):02d}:{(current_time % 60):02d}", "medium_bold", (self.width - 150, 150))
+        self.draw_text(f"Moves: {state.stats['steps']}", "medium_bold", (self.width - 50, 50), alignment="right")
+        self.draw_text(f"Time: {(current_time // 60):02d}:{(current_time % 60):02d}", "medium_bold", (self.width - 50, 150), alignment="right")
 
         self.draw_board(state)
 
