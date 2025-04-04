@@ -5,6 +5,6 @@ Iterative Deepening AI,0.009996175765991211,1328.91,3,leveltest
 A* Maximize Empty AI,0.007909297943115234,1329.83,3,leveltest
 A* Minimize Goal AI,0.0032341480255126953,1331.9,3,leveltest
 Human,4.34367299079895,920.88,3,leveltest
-Greedy Maximize Empty AI,0,0,0,leveltest
-Greedy Minimize Goal AI,0,0,0,leveltest
 Human,39.47065591812134,633.38,10,levelmedium
+Human,53.9889030456543,907.59,14,levelhardest
+A* Maximize Collapse AI,0.004354715347290039,1331.4,3,leveltest
