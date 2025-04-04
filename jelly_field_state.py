@@ -79,10 +79,10 @@ class Jelly:
     def __hash__(self):
         return hash(tuple(map(tuple, self.array)))
 
-
 class JellyFieldState:
     def __init__(self, file=None):
         if file:
+            print("Loading from file...")
             self.load_from_file(file)
         else:
             self.c1 = 0
@@ -91,6 +91,8 @@ class JellyFieldState:
             self.next_jellies = InfiniteArray([])
             self.goal = {}
             self.colors = {}
+            self.nonEmptyJellyCount = 0
+            self.collapseCount = 0
         self.stats = {'time': 0, 'steps': 0, 'level': "", 'player': "", 'score': 0}
         self.player = None
                         
@@ -153,6 +155,15 @@ class JellyFieldState:
                     self.next_jellies.append(Jelly(jelly_array))
                     i += 2
                 i += 1
+
+        self.nonEmptyJellyCount = 0
+        for row in range(self.c1):
+            for col in range(self.c2):
+                if self.board[row][col].type != "empty" and self.board[row][col].type != "na":
+                    self.nonEmptyJellyCount += 1
+
+        self.collapseCount = 0
+
     def checkCollision(self, jelly1, jelly2, direction):
         if jelly1.type == "na" or jelly2.type == "na":
             return None
@@ -175,6 +186,7 @@ class JellyFieldState:
                 collisionColors.append(color1)
 
         return collisionColors if collisionColors else None
+
     def collapse(self):
         changes = True
         while changes:
@@ -204,13 +216,16 @@ class JellyFieldState:
                                         
                     for color in globalCollisionColors:
                         self.board[i][j].erase(color)
-                        self.goal[color] = max(self.goal[color] - 1, 0)
+                        self.collapseCount += 1
+                        if (color in self.goal):
+                            self.goal[color] = max(self.goal[color] - 1, 0)
                         self.board[i][j].expand()
         
                                 
     def move(self, seqNum, x, y):
         if ((self.board[y][x].type == "empty") and (seqNum == 0 or seqNum == 1)):
             self.board[y][x] = self.next_jellies[seqNum]
+            self.nonEmptyJellyCount += 1
             self.next_jellies.pop(seqNum)
         else :
             print("Invalid Jelly Move")
@@ -228,7 +243,6 @@ class JellyFieldState:
 
     def __str__(self):
         return f"Colors {self.colors} Board: {self.board}, Next Jellies: {self.next_jellies}, Goal: {self.goal}"
-
     def printBoard(self):
         for row in self.board:
             for i in range(2):

@@ -61,12 +61,14 @@ class AIAgent:
         return None
 
     def bfs_search(self):
+        start = time.time()
         root = TreeNode(self.initial_state)
         queue = deque([root])
         visited = [root]
         while queue:
             node = queue.popleft()
             if self.goal_state(node.state):
+                self.time = time.time() - start
                 return node
             for state in self.get_child_states(node.state):
                 if state not in visited:
@@ -74,9 +76,12 @@ class AIAgent:
                     child = TreeNode(state)
                     node.add_child(child)
                     queue.append(child)
+        
+        self.time = time.time() - start
         return None
     
     def iterative_deepening(self, max_depth=10):
+        start = time.time()
         depth = 1
         while depth < max_depth:
             node = TreeNode(self.initial_state)
@@ -86,6 +91,7 @@ class AIAgent:
             while stack:
                 node = stack.pop()
                 if self.goal_state(node.state):
+                    self.time = time.time() - start
                     return node
                 for state in self.get_child_states(node.state):
                     if state not in visited and node.depth < depth:
@@ -96,14 +102,18 @@ class AIAgent:
             
             depth += 1
 
+        self.time = time.time() - start
         return None
 
     def heuristic_goal_vals(self, state):
         return sum(state.goal.values())
     def heuristic_non_empty_jellies(self, state):
-        return len([jelly for row in state.board for jelly in row if (not jelly.is_empty() and not jelly.is_na())])
+        return state.nonEmptyJellyCount
+    def heuristic_collapse_count(self, state):
+        return 1000 / (state.collapseCount + 1)
     
     def a_star_search(self, heuristic, weight=1):
+        start = time.time()
         root = TreeNode(self.initial_state)
         queue = [(0, root)]
         
@@ -111,6 +121,7 @@ class AIAgent:
         while queue:
             _, node = heapq.heappop(queue)
             if self.goal_state(node.state):
+                self.time = time.time() - start
                 return node
             visited.add(node.state)
             for state in self.get_child_states(node.state):
@@ -120,6 +131,38 @@ class AIAgent:
                     node.add_child(child)
                     cost = node.depth + weight * heuristic(state)
                     heapq.heappush(queue, (cost, child))
+
+        self.time = time.time() - start
+        return None
+    
+    def greedy_search(self, heuristic):
+        start = time.time()
+        stack = []
+        initial_node = TreeNode(self.initial_state)
+        stack.append(initial_node)
+        visited = set()
+
+        while stack:
+            node = stack.pop()
+            if self.goal_state(node.state):
+                self.time = time.time() - start
+                return node
+
+            visited.add(node.state)
+            best_child = None
+            best_heuristic = float('inf')
+            for state in self.get_child_states(node.state):
+                if state not in visited:
+                    h_value = heuristic(state)
+                    if h_value < best_heuristic:
+                        best_heuristic = h_value
+                        best_child = TreeNode(state)
+            
+            if best_child:
+                node.add_child(best_child)
+                stack.append(best_child)
+
+        self.time = time.time() - start
         return None
     
     def get_solution_stats(self, node):
