@@ -35,10 +35,10 @@ class EventHandler:
         exit()
 
     def handle_events(self, state):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        event = pygame.event.wait()
+        if event.type == pygame.QUIT:
                 self.quit()
-            else:
+        else:
                 next_screen, next_state = self.screens[self.current_screen].handle_event(state, event)
                 if self.current_screen == "player_select":
                     if next_screen == "game_screen":

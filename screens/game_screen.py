@@ -1,4 +1,4 @@
-import pygame, time
+import pygame, time, math
 from screens.screen import Screen
 
 class GameScreen(Screen):
@@ -9,7 +9,9 @@ class GameScreen(Screen):
         self.cell_size = 50
         self.dragging = False
         self.selected_jelly = None
+        self.show_hint = False
         self.add_text_button("Main Menu", "medium_bold", (50, 50), alignment="left")
+        self.add_text_button("Get Hint", "medium_bold", (50, self.height - 50), alignment="left")
 
         self.jelly_positions = {}
         for i in range(len(state.next_jellies)):
@@ -61,12 +63,55 @@ class GameScreen(Screen):
                     pygame.draw.rect(self.surface, cell_color, cell_rect)
                     pygame.draw.rect(self.surface, (255, 255, 255), cell_rect, 2)
 
+    def draw_hint(self, state):
+        move = state.get_next_best_move()
+        if move:
+            row, col, jelly_index = move
+            
+            if jelly_index >= len(state.next_jellies):
+                return  
+
+            jelly_rect = self.jelly_positions[jelly_index]
+            start_x = jelly_rect.x + self.cell_size // 2
+            start_y = jelly_rect.y + self.cell_size // 2
+            
+            board_x = (self.width - len(state.board[0]) * self.cell_size) // 2
+            board_y = 150
+            target_x = board_x + col * self.cell_size + self.cell_size // 2
+            target_y = board_y + row * self.cell_size + self.cell_size // 2
+
+            pygame.draw.line(self.surface, (255, 0, 0), (start_x, start_y), (target_x, target_y), 5)
+            
+            pygame.draw.circle(self.surface, (0, 0, 255), (start_x, start_y), 6)
+            
+            dx = target_x - start_x
+            dy = target_y - start_y
+            length = math.sqrt(dx * dx + dy * dy)
+        
+            if length > 0:
+                dx /= length
+                dy /= length
+
+                arrow_size = 20
+
+                point1 = (
+                    target_x - arrow_size * (dx + 0.5 * dy),
+                    target_y - arrow_size * (dy - 0.5 * dx)
+                )
+                point2 = (
+                    target_x - arrow_size * (dx - 0.5 * dy),
+                    target_y - arrow_size * (dy + 0.5 * dx)
+                )
+
+                pygame.draw.polygon(self.surface, (255, 0, 0), [(target_x, target_y), point1, point2])
+
     def display(self, state):
         current_time = round(time.time() - state.stats['time'])
 
         self.surface.blit(self.bg, (0, 0))
         
         self.draw_button("Main Menu", "medium_bold", (50, 50), alignment="left")
+        self.draw_button("Get Hint", "medium_bold", (50, self.height - 50), alignment="left")
 
         self.draw_goals(state)
         
@@ -74,6 +119,8 @@ class GameScreen(Screen):
         self.draw_text(f"Time: {(current_time // 60):02d}:{(current_time % 60):02d}", "medium_bold", (self.width - 50, 150), alignment="right")
 
         self.draw_board(state)
+        if(self.show_hint):
+            self.draw_hint(state)
 
         self.draw_next_jellies(state)
                 
@@ -86,7 +133,20 @@ class GameScreen(Screen):
                     if rect.collidepoint(event.pos):
                         if button_text == "Main Menu":
                             return "main_menu", state
-            
+                        if button_text == "Get Hint":
+                            self.show_hint = not self.show_hint
+                            self.display(state)
+                            start_time = time.time()
+                            while time.time() - start_time < 1:
+                                self.display(state)
+                                pygame.time.delay(10) 
+                                for e in pygame.event.get():
+                                    if e.type == pygame.QUIT:
+                                        pygame.quit()
+                                        return "quit", state
+                            self.show_hint = False
+                            
+                            return "game_screen", state
             mouse_x, mouse_y = event.pos
                 
             for i in range(min(2, len(state.next_jellies))):

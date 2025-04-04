@@ -2,6 +2,7 @@ import time
 import copy
 import pandas as pd
 from collections import deque
+import ai
 
 #For convertion E means empty space, N means Non playable space
 class InfiniteArray:
@@ -273,3 +274,14 @@ class JellyFieldState:
                 if jelly.type == "empty":
                     return False
         return True
+    
+    def get_next_best_move(self):
+        aiAgent = ai.AIAgent(self)
+        node = aiAgent.a_star_search(aiAgent.heuristic_goal_vals, 1)
+
+        move = None
+
+        while node.parent:
+            move = node.move
+            node = node.parent
+        return move
