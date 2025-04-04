@@ -2,11 +2,15 @@ import pygame, colorsys
 from abc import ABC, abstractmethod
 
 class Screen(ABC):
+    _surface = None
+
     def __init__(self, resolution =(1280, 720), buttons={}, font='./assets/FunBlob.ttf', bold='./assets/FunBlob.ttf'):
         self.bg = pygame.transform.scale(pygame.image.load("./assets/balala.jpg"), resolution)
         self.width, self.height = resolution
         self.buttons = buttons
-        self.surface = pygame.display.set_mode(resolution)
+        if Screen._surface is None:
+            Screen._surface = pygame.display.set_mode(resolution)
+        self.surface = Screen._surface
         self.fonts = self.init_fonts(font, bold)
 
     def init_fonts(self, font, bold):
