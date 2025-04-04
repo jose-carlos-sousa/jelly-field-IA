@@ -1,0 +1,9 @@
+Player,Time,Score,Moves,Level
+Depth-First Search AI,0.004425048828125,1331.37,3,leveltest
+Breadth-First Search AI,0.0078582763671875,1329.85,3,leveltest
+Iterative Deepening AI,0.009996175765991211,1328.91,3,leveltest
+A* Maximize Empty AI,0.007909297943115234,1329.83,3,leveltest
+A* Minimize Goal AI,0.0032341480255126953,1331.9,3,leveltest
+Human,4.34367299079895,920.88,3,leveltest
+Greedy Maximize Empty AI,0,0,0,leveltest
+Greedy Minimize Goal AI,0,0,0,leveltest

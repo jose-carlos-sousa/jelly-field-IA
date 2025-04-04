@@ -1,5 +1,5 @@
 from collections import deque
-import copy
+import copy, time
 import heapq
 
 class TreeNode:
@@ -24,6 +24,7 @@ class TreeNode:
 class AIAgent:
     def __init__(self, state):
         self.initial_state = state
+        self.time = 0
 
     def goal_state(self, state):
         return all(value == 0 for value in state.goal.values())
@@ -43,6 +44,7 @@ class AIAgent:
         return stateDict
     
     def depth_first_search(self):
+        start = time.time()
         root = TreeNode(self.initial_state)
         stack = [root]
         visited = [root]
@@ -50,6 +52,7 @@ class AIAgent:
         while stack:
             node = stack.pop()
             if self.goal_state(node.state):
+                self.time = time.time() - start
                 return node
             for moveArr, state in self.get_child_states(node.state).items():
                 if state not in visited:
@@ -59,15 +62,18 @@ class AIAgent:
                     node.add_child(new_state)
                     stack.append(new_state)
 
+        self.time = time.time() - start
         return None
 
     def bfs_search(self):
+        start = time.time()
         root = TreeNode(self.initial_state)
         queue = deque([root])
         visited = [root]
         while queue:
             node = queue.popleft()
             if self.goal_state(node.state):
+                self.time = time.time() - start
                 return node
             for moveArr, state in self.get_child_states(node.state).items():
                 if state not in visited:
@@ -76,9 +82,12 @@ class AIAgent:
                     child.add_move(moveArr)
                     node.add_child(child)
                     queue.append(child)
+        
+        self.time = time.time() - start
         return None
     
     def iterative_deepening(self, max_depth=10):
+        start = time.time()
         depth = 1
         while depth < max_depth:
             node = TreeNode(self.initial_state)
@@ -90,6 +99,7 @@ class AIAgent:
                 node = stack.pop()
                 print(f"Depth {node.depth}")
                 if self.goal_state(node.state):
+                    self.time = time.time() - start
                     return node
                 for moveArr, state in self.get_child_states(node.state).items():
                     if node.depth < depth:
@@ -101,6 +111,7 @@ class AIAgent:
             print(f"Depth {depth} failed")
             depth += 1
 
+        self.time = time.time() - start
         return None
 
     def heuristic_goal_vals(self, state):
@@ -111,6 +122,7 @@ class AIAgent:
         return 1000 / (state.collapseCount + 1)
     
     def a_star_search(self, heuristic, weight=1):
+        start = time.time()
         root = TreeNode(self.initial_state)
         queue = [(0, root)]
         
@@ -118,6 +130,7 @@ class AIAgent:
         while queue:
             _, node = heapq.heappop(queue)
             if self.goal_state(node.state):
+                self.time = time.time() - start
                 return node
             visited.add(node.state)
             for moveArr, state in self.get_child_states(node.state).items():
@@ -128,9 +141,12 @@ class AIAgent:
                     node.add_child(child)
                     cost = node.depth + weight * heuristic(state)
                     heapq.heappush(queue, (cost, child))
+
+        self.time = time.time() - start
         return None
     
     def greedy_search(self, heuristic):
+        start = time.time()
         stack = []
         initial_node = TreeNode(self.initial_state)
         stack.append(initial_node)
@@ -139,6 +155,7 @@ class AIAgent:
         while stack:
             node = stack.pop()
             if self.goal_state(node.state):
+                self.time = time.time() - start
                 return node
 
             visited.add(node.state)
@@ -155,22 +172,20 @@ class AIAgent:
                 node.add_child(best_child)
                 stack.append(best_child)
 
+        self.time = time.time() - start
         return None
     
-    def print_solution(self, node):
-
+    def get_solution_stats(self, node):
         steps = 0
         if (not node):
-            print("NO SOLUTION FOUND MENDES!")
-            return
+            return None
 
         while (node.parent):
-            node.state.printBoard()
-            print(f"move {node.move}")
             steps += 1
             node = node.parent
-        node.state.printBoard()
-   
-        print(f"Solution found in {steps} steps\n")
-        return  
+            
+        board_size = len(node.state.board) * len(node.state.board[0])
+
+        score = (1000 * board_size) / (steps + self.time)
+        return round(score, 2), steps, self.time
 
