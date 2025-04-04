@@ -166,14 +166,15 @@ class pygameGUI:
             for col in range(cols):
                 square = board[row][col].array
                 srows, scols = len(square), len(square[0])
-                for square_row in range(srows):
-                    for square_column in range(scols):
-                        cell_color = state.colors[square[square_row][square_column]]
-                        square_width, square_height = self.cell_size / scols, self.cell_size / srows
-                        cell_rect = pygame.Rect(board_x + col * self.cell_size + square_column * square_width,
-                        board_y + row * self.cell_size + square_height * square_row, square_width, square_height)
-                        pygame.draw.rect(self.screen, cell_color, cell_rect)
-                        pygame.draw.rect(self.screen, (255, 255, 255), cell_rect, 2)
+                if board[row][col].type != "na":
+                    for square_row in range(srows):
+                        for square_column in range(scols):
+                            cell_color = state.colors[square[square_row][square_column]]
+                            square_width, square_height = self.cell_size / scols, self.cell_size / srows
+                            cell_rect = pygame.Rect(board_x + col * self.cell_size + square_column * square_width,
+                            board_y + row * self.cell_size + square_height * square_row, square_width, square_height)
+                            pygame.draw.rect(self.screen, cell_color, cell_rect)
+                            pygame.draw.rect(self.screen, (255, 255, 255), cell_rect, 2)
 
     def draw_goals(self, state):
         goals = len(state.goal)
