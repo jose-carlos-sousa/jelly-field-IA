@@ -20,8 +20,15 @@ class AIGame(Screen):
             solution = self.gajo.a_star_search(self.gajo.heuristic_non_empty_jellies)
         elif state.player == "A* Minimize Goal AI":
             solution = self.gajo.a_star_search(self.gajo.heuristic_goal_vals)
+        elif state.player == "Greedy Maximize Empty AI":
+            solution = self.gajo.greedy_search(self.gajo.heuristic_non_empty_jellies)
+        elif state.player == "Greedy Minimize Goal AI":
+            solution = self.gajo.greedy_search(self.gajo.heuristic_goal_vals)
 
-        score, steps, solution_time = self.gajo.get_solution_stats(solution)
+        if solution:
+            score, steps, solution_time = self.gajo.get_solution_stats(solution)
+        else:
+            score, steps, solution_time = 0, 0, 0
 
         return {'time': solution_time, 'level': state.stats['level'], 'player': state.player, 'score': score, 'steps': steps}
 
