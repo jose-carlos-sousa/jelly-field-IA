@@ -61,16 +61,17 @@ class GameScreen(Screen):
                     pygame.draw.rect(self.surface, (255, 255, 255), cell_rect, 2)
 
     def display(self, state):
+        current_time = round(time.time() - state.stats['time'])
+
         self.surface.fill((0, 0, 0))
         
         self.draw_text("Main Menu", "large_bold", (150, 50))
 
         self.draw_goals(state)
         
-        #score_text = self.font.render(f"Score: {state.score}", True, (255, 255, 255))
-        #score_rect = score_text.get_rect(topright=(self.screen.get_width() - 10, 10))
-        #self.screen.blit(score_text, score_rect)
-        
+        self.draw_text(f"Moves: {state.stats['steps']}", "medium_bold", (self.width - 150, 50))
+        self.draw_text(f"Time: {(current_time // 60):02d}:{(current_time % 60):02d}", "medium_bold", (self.width - 150, 150))
+
         self.draw_board(state)
 
         self.draw_next_jellies(state)
@@ -125,10 +126,11 @@ class GameScreen(Screen):
                 state.move(selected_jelly, col, row)
                 state.collapse()
                 if state.isGoal():
-                    state.stats['time'] = time.time() - state.stats['time']
+                    end = time.time() - state.stats['time']
                     board_size = len(state.board) * len(state.board[0])
-                    state.stats['score'] = round((1000 * board_size) / (state.stats['steps'] + state.stats['time']), 2)
+                    state.stats['score'] = round((1000 * board_size) / end, 2)
                     self.display(state)
+                    state.stats['time'] = end
                     return "victory", state
                 elif state.isBoardFull():
                     self.display(state)
