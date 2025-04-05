@@ -20,10 +20,14 @@ class AIGame(Screen):
             solution = self.gajo.a_star_search(self.gajo.heuristic_non_empty_jellies)
         elif state.player == "A* Minimize Goal AI":
             solution = self.gajo.a_star_search(self.gajo.heuristic_goal_vals)
+        elif state.player == "A* Maximize Collapse AI":
+            solution = self.gajo.a_star_search(self.gajo.heuristic_collapse_count)
         elif state.player == "Greedy Maximize Empty AI":
             solution = self.gajo.greedy_search(self.gajo.heuristic_non_empty_jellies)
         elif state.player == "Greedy Minimize Goal AI":
             solution = self.gajo.greedy_search(self.gajo.heuristic_goal_vals)
+        elif state.player == "Greedy Maximize Collapse AI":
+            solution = self.gajo.greedy_search(self.gajo.heuristic_collapse_count)
 
         if solution:
             score, steps, solution_time = self.gajo.get_solution_stats(solution)
@@ -53,7 +57,8 @@ class AIGame(Screen):
                 for button_text, rect in self.buttons.items():
                     if rect.collidepoint(event.pos):
                         if button_text == "Return To Main Menu":
-                            self.save_game(self.stats)
+                            if (self.stats['steps'] > 0):
+                                self.save_game(self.stats)
                             return "main_menu", state
 
         return "ai_game", state
