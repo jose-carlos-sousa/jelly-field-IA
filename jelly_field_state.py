@@ -94,7 +94,7 @@ class JellyFieldState:
             self.colors = {}
             self.nonEmptyJellyCount = 0
             self.collapseCount = 0
-        self.stats = {'time': 0, 'steps': 0, 'level': "", 'player': "", 'score': 0}
+        self.stats = {'time': 0, 'steps': 0, 'level': "", 'player': "", 'score': 0, 'memory': 0}
         self.player = None
                         
     def load_from_file(self, file):

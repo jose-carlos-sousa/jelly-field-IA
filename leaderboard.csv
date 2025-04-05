@@ -9,3 +9,14 @@ Greedy Maximize Empty AI,0,0,0,leveltest
 Greedy Minimize Goal AI,0,0,0,leveltest
 Human,31.22113561630249,1569.45,6,leveleasy
 Human,19.03662133216858,2573.99,5,leveleasy
+Human,2235.736327648163,21.92,6,leveleasy
+Human,19.742103338241577,2482.01,5,leveleasy
+Human,137.79493761062622,355.6,15,levelhardest
+Human,25.110535860061646,1951.37,7,leveleasy
+Human,23.847697734832764,2054.71,5,leveleasy
+Human,43.87808585166931,364.65,8,leveltest2
+Human,49.61408519744873,322.49,18,levelhard
+Depth-First Search AI,2.139793634414673,1319.34,35,levelhardest
+Human,83.79948163032532,584.73,23,levelhardest
+Human,41.55645942687988,385.02,8,leveltest2
+Human,64.45301556587219,760.24,6,leveleasy

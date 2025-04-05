@@ -1,6 +1,7 @@
 from collections import deque
 import copy, time
 import heapq
+import tracemalloc
 
 class TreeNode:
     def __init__(self, state, parent=None):
@@ -25,6 +26,7 @@ class AIAgent:
     def __init__(self, state):
         self.initial_state = state
         self.time = 0
+        self.memory = 0
 
     def goal_state(self, state):
         return all(value == 0 for value in state.goal.values())
@@ -44,6 +46,7 @@ class AIAgent:
         return stateDict
     
     def depth_first_search(self):
+        tracemalloc.start()
         start = time.time()
         root = TreeNode(self.initial_state)
         stack = [root]
@@ -63,9 +66,13 @@ class AIAgent:
                     stack.append(new_state)
 
         self.time = time.time() - start
+        _, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        self.memory = peak 
         return None
 
     def bfs_search(self):
+        tracemalloc.start()
         start = time.time()
         root = TreeNode(self.initial_state)
         queue = deque([root])
@@ -84,9 +91,13 @@ class AIAgent:
                     queue.append(child)
         
         self.time = time.time() - start
+        _, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        self.memory = peak 
         return None
     
     def iterative_deepening(self, max_depth=10):
+        tracemalloc.start()
         start = time.time()
         depth = 1
         while depth < max_depth:
@@ -112,6 +123,9 @@ class AIAgent:
             depth += 1
 
         self.time = time.time() - start
+        _, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        self.memory = peak
         return None
 
     def heuristic_goal_vals(self, state):
@@ -122,6 +136,7 @@ class AIAgent:
         return 1000 / (state.collapseCount + 1)
     
     def a_star_search(self, heuristic, weight=1):
+        tracemalloc.start()
         start = time.time()
         root = TreeNode(self.initial_state)
         queue = [(0, root)]
@@ -143,9 +158,13 @@ class AIAgent:
                     heapq.heappush(queue, (cost, child))
 
         self.time = time.time() - start
+        _, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        self.memory = peak
         return None
     
     def greedy_search(self, heuristic):
+        tracemalloc.start()
         start = time.time()
         stack = []
         initial_node = TreeNode(self.initial_state)
@@ -173,6 +192,9 @@ class AIAgent:
                 stack.append(best_child)
 
         self.time = time.time() - start
+        _, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        self.memory = peak
         return None
     
     def get_solution_stats(self, node):
