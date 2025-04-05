@@ -1,0 +1,9 @@
+Score: 8532.0
+Steps: 5
+Time: 0.74308 seconds
+Memory: 0 bytes
+Move: row=6, col=4, jelly_index=0
+Move: row=2, col=1, jelly_index=0
+Move: row=1, col=2, jelly_index=1
+Move: row=2, col=5, jelly_index=0
+Move: row=3, col=0, jelly_index=1

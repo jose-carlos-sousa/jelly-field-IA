@@ -1,0 +1,9 @@
+Score: 8520.32
+Steps: 5
+Time: 0.75096 seconds
+Memory: 0 bytes
+Move: (6, 4, 0)
+Move: (2, 1, 0)
+Move: (1, 2, 1)
+Move: (2, 5, 0)
+Move: (3, 0, 1)
