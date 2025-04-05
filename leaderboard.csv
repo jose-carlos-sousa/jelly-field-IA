@@ -23,3 +23,15 @@ Human,64.45301556587219,760.24,6,leveleasy
 A* Maximize Collapse AI,0.8606812953948975,8360.8,5,leveleasy
 Human,70.60158920288086,694.04,5,leveleasy
 A* Maximize Collapse AI,0.7429482936859131,8532.2,5,leveleasy
+Greedy Maximize Empty AI,0.7076594829559326,1867.82,10,leveleasiest
+A* Maximize Collapse AI,0.892019510269165,1836.21,10,leveleasiest
+A* Minimize Goal AI,1.0561723709106445,2208.44,8,leveleasiest
+A* Maximize Empty AI,3.9925334453582764,1455.53,7,leveltest2
+Human,19.33090353012085,2534.8,5,leveleasy
+Human,21.076558589935303,2324.86,6,leveleasy
+Human,18.69868230819702,2620.51,6,leveleasy
+Human,16.11190962791443,3041.23,5,leveleasy
+Human,16.60042643547058,2951.73,5,leveleasy
+Human,34.09806776046753,469.23,9,levelhard
+Human,81.44586944580078,601.63,17,levelhardest
+Human,18.510863780975342,2647.09,5,leveleasy

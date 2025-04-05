@@ -1,0 +1,4 @@
+Score: 1864.28
+Steps: 10
+Time: 0.72801 seconds
+Memory: 1059914 bytes

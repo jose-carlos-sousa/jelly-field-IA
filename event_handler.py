@@ -35,6 +35,10 @@ class EventHandler:
         exit()
 
     def handle_events(self, state):
+        if(not pygame.event.peek()):
+            if not state.nextBestMove:
+                state.load_next_best_move()
+            return state
         event = pygame.event.wait()
         if event.type == pygame.QUIT:
                 self.quit()

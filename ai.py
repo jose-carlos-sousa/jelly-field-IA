@@ -196,12 +196,14 @@ class AIAgent:
             visited.add(node.state)
             best_child = None
             best_heuristic = float('inf')
-            for state in self.get_child_states(node.state):
+            for moveArr, state in self.get_child_states(node.state).items():
                 if state not in visited:
                     h_value = heuristic(state)
                     if h_value < best_heuristic:
                         best_heuristic = h_value
                         best_child = TreeNode(state)
+                        best_child.add_move(moveArr)
+                        node.add_child(best_child)
             
             if best_child:
                 node.add_child(best_child)

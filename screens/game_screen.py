@@ -186,6 +186,7 @@ class GameScreen(Screen):
                 state.stats['steps'] += 1
                 state.move(selected_jelly, col, row)
                 state.collapse()
+                state.nextBestMove = None
                 if state.isGoal():
                     end = time.time() - state.stats['time']
                     board_size = len(state.board) * len(state.board[0])
