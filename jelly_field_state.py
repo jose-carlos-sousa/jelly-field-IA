@@ -41,25 +41,51 @@ class Jelly:
             print("Invalid Jelly Type")
             return
         
-    def expand(self):
-        if(self.type == "empty"):
+    def expand(self, boardState):
+        if self.type == "empty" or self.type == "na":
             return
-        if(self.type == "na"):
-            return
-        newBoard = [row.copy() for row in self.array]
+        
+        new_board = [row.copy() for row in self.array]
+        non_empty_count = sum(1 for i in range(2) for j in range(2) if self.array[i][j] != 'E')
+        
+        # Check the occurrence of each color
+        color_counts = {}
+        for i in range(2):
+            for j in range(2):
+                color = self.array[i][j]
+                if color != 'E':
+                    color_counts[color] = color_counts.get(color, 0) + 1
+        
         for i in range(2):
             for j in range(2):
                 if self.array[i][j] != 'E':
-                    newBoard[i][j] = self.array[i][j]
-                    neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
-                    for ni, nj in neighbors:
+                    current_color = self.array[i][j]
+                    
+                    # If the color has more than one occurrence, we expand only when it is the only color in the jelly
+                    if color_counts[current_color] > 1 and len(color_counts) > 1:
+                        continue
+                    
+                    new_board[i][j] = self.array[i][j]
+                    
+                    if non_empty_count == 1:
+                        directions = [(-1, -1), (-1, 0), (-1, 1),
+                                      ( 0, -1),          ( 0, 1),
+                                      ( 1, -1), ( 1, 0), ( 1, 1)]
+                    else:
+                        directions = [          (-1, 0), 
+                                      ( 0, -1),          ( 0, 1),
+                                                ( 1, 0)         ]
+                    
+                    for di, dj in directions:
+                        ni, nj = i + di, j + dj
                         if 0 <= ni < 2 and 0 <= nj < 2:
                             if self.array[ni][nj] == 'E':
-                                newBoard[ni][nj] = self.array[i][j]
-                            
-        self.array = newBoard
-        if all(self.array[i][j] == 'E' for i in range(2) for j in range(2)):
+                                new_board[ni][nj] = self.array[i][j]
+        
+        self.array = new_board
+        if all(cell == 'E' for row in self.array for cell in row):
             self.type = "empty"
+            boardState.nonEmptyJellyCount -= 1
 
     def is_empty(self):
         return self.type == "empty"           
@@ -220,7 +246,7 @@ class JellyFieldState:
                         self.collapseCount += 1
                         if (color in self.goal):
                             self.goal[color] = max(self.goal[color] - 1, 0)
-                        self.board[i][j].expand()
+                        self.board[i][j].expand(self)
         
                                 
     def move(self, seqNum, x, y):

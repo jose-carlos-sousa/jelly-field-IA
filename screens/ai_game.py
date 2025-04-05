@@ -49,6 +49,7 @@ class AIGame(Screen):
         self.draw_text(f"Time: {self.stats['time']:.2f} seconds", "medium", (self.width // 2, 300))
         self.draw_text(f"Moves: {self.stats['steps']}", "medium", (self.width // 2, 400))
         self.draw_text(f"Score: {self.stats['score']:.2f}", "large", (self.width // 2, 500))
+        
 
         pygame.display.flip()
 

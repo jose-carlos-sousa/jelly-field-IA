@@ -41,5 +41,6 @@ class LevelSelect(Screen):
                             file = os.path.join('.', 'levels', '.'.join([self.levels[self.selected], 'txt']))
                             new_state = JellyFieldState(file)
                             new_state.stats['level'] = self.levels[self.selected]
+                            
                             return "player_select", new_state
         return "level_select", state

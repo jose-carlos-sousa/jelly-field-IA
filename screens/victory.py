@@ -7,7 +7,6 @@ class Victory(Screen):
 
     def display(self, state):
         self.draw_text("YOU WON!", "large_bold", (self.width // 2, self.height // 2))
-
         pygame.display.flip()
 
     def handle_event(self, state, event):
