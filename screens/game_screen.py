@@ -10,6 +10,7 @@ class GameScreen(Screen):
         self.dragging = False
         self.selected_jelly = None
         self.show_hint = False
+        self.hint_button_pressed = False
         self.add_text_button("Main Menu", "medium_bold", (50, 50), alignment="left")
         self.add_text_button("Get Hint", "medium_bold", (50, self.height - 50), alignment="left")
 
@@ -73,6 +74,7 @@ class GameScreen(Screen):
                     pygame.draw.rect(self.surface, cell_color, cell_rect)
                     pygame.draw.rect(self.surface, (255, 255, 255), cell_rect, 2)
 
+    # Draws a hint line arrow from the jelly chosen to the target Jelly
     def draw_hint(self, state):
         move = state.get_next_best_move()
         if move:
@@ -121,7 +123,14 @@ class GameScreen(Screen):
         self.surface.blit(self.bg, (0, 0))
         
         self.draw_button("Main Menu", "medium_bold", (50, 50), alignment="left")
-        self.draw_button("Get Hint", "medium_bold", (50, self.height - 50), alignment="left")
+        if self.hint_button_pressed:
+            hint_button_rect = self.buttons.get("Get Hint")
+            if hint_button_rect:
+                glow_rect = hint_button_rect.inflate(10, 10)
+                pygame.draw.rect(self.surface, (255, 0, 0), glow_rect, border_radius=5)  # Red glow
+                self.draw_button("Get Hint", "medium_bold", (50, self.height - 50), alignment="left")
+        else:
+            self.draw_button("Get Hint", "medium_bold", (50, self.height - 50), alignment="left")
 
         self.draw_goals(state)
         
@@ -144,10 +153,12 @@ class GameScreen(Screen):
                         if button_text == "Main Menu":
                             return "main_menu", state
                         if button_text == "Get Hint":
+                            self.hint_button_pressed = not self.hint_button_pressed # Toggle the hint button state
+                            self.display(state)
                             self.show_hint = not self.show_hint
                             self.display(state)
                             start_time = time.time()
-                            while time.time() - start_time < 1:
+                            while time.time() - start_time < 1: 
                                 self.display(state)
                                 pygame.time.delay(10) 
                                 for e in pygame.event.get():
@@ -155,6 +166,7 @@ class GameScreen(Screen):
                                         pygame.quit()
                                         return "quit", state
                             self.show_hint = False
+                            self.hint_button_pressed = False
                             
                             return "game_screen", state
             mouse_x, mouse_y = event.pos
@@ -196,6 +208,7 @@ class GameScreen(Screen):
                 state.stats['steps'] += 1
                 state.move(selected_jelly, col, row)
                 state.collapse()
+                state.nextBestMove = None
                 if state.isGoal():
                     end = time.time() - state.stats['time']
                     board_size = len(state.board) * len(state.board[0])

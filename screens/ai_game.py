@@ -102,6 +102,11 @@ class AIGame(Screen):
             self.add_text_button(str(weight), "medium_bold", (x, y))
             self.draw_button(str(weight), "medium_bold", (x, y))
 
+    def display_calculation(self):
+        self.surface.blit(self.bg, (0, 0))
+        self.draw_text("Calculating...", "large_bold", (self.width // 2, self.height // 2))
+        pygame.display.flip()
+
     def display(self, state):
         self.surface.blit(self.bg, (0, 0))
         self.draw_button("Return To Main Menu", "large_bold", (self.width // 2, self.height - 100))
@@ -121,6 +126,9 @@ class AIGame(Screen):
                 self.draw_weight_choices()
             elif state.player.startswith("Iterative"):
                 self.draw_depth_choices()
+            else:
+                self.display_calculation()
+                self.stats = self.run_game(state)
 
 
         pygame.display.flip()
@@ -137,11 +145,13 @@ class AIGame(Screen):
                             self.weight = float(button_text)
                             self.buttons = {}
                             self.add_text_button("Return To Main Menu", "large_bold", (self.width // 2, self.height - 100))
+                            self.display_calculation()
                             self.stats = self.run_game(state)
                         elif state.player.startswith("Iterative"):
                             self.depth = int(button_text)
                             self.buttons = {}
                             self.add_text_button("Return To Main Menu", "large_bold", (self.width // 2, self.height - 100))
+                            self.display_calculation()
                             self.stats = self.run_game(state)
 
         return "ai_game", state

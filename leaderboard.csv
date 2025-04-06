@@ -38,3 +38,34 @@ Iterative Deepening AI (5.0),0.03846597671508789,1316.45,3,leveltest
 A* Minimize Goal AI (4.5),1.0237905979156494,1773.09,8,leveltest2
 Iterative Deepening AI (10),0.03299546241760254,1318.83,3,leveltest
 Human,10.04268217086792,398.3,3,leveltest
+Greedy Maximize Empty AI,0.7076594829559326,1867.82,10,leveleasiest
+A* Maximize Collapse AI,0.892019510269165,1836.21,10,leveleasiest
+A* Minimize Goal AI,1.0561723709106445,2208.44,8,leveleasiest
+A* Maximize Empty AI,3.9925334453582764,1455.53,7,leveltest2
+Human,19.33090353012085,2534.8,5,leveleasy
+Human,21.076558589935303,2324.86,6,leveleasy
+Human,18.69868230819702,2620.51,6,leveleasy
+Human,16.11190962791443,3041.23,5,leveleasy
+Human,16.60042643547058,2951.73,5,leveleasy
+Human,34.09806776046753,469.23,9,levelhard
+Human,81.44586944580078,601.63,17,levelhardest
+Human,18.510863780975342,2647.09,5,leveleasy
+Human,168.96073150634766,290.01,17,levelhardest
+Human,20.93877363204956,2340.16,5,leveleasy
+Human,32.41496539115906,771.25,9,levelmedium
+A* Maximize Collapse AI,2.0518202781677246,6948.56,5,leveleasy
+A* Minimize Goal AI,1.4168751239776611,1699.08,8,leveltest2
+A* Minimize Goal AI,23.57738995552063,1303.98,14,levelhardest
+A* Minimize Goal AI,1.4718608856201172,1689.21,8,leveltest2
+A* Maximize Collapse AI,7.878562688827515,2141.74,15,levelhardest
+A* Maximize Empty AI,3.0655248165130615,1589.58,7,leveltest2
+A* Minimize Goal AI,0.38710570335388184,1704.47,9,levelhard
+A* Maximize Collapse AI,7.9389965534210205,2136.1,15,levelhardest
+Depth-First Search AI,2.8413710594177246,1406.37,32,levelhardest
+Human,20.59298586845398,2379.45,5,leveleasy
+Human,57.67403769493103,277.42,14,levelhard
+A* Maximize Collapse AI,7.936873197555542,2136.3,15,levelhardest
+Depth-First Search AI,0.3441305160522461,872.21,18,leveltest2
+Depth-First Search AI,0.008101463317871094,1329.74,3,leveltest
+Depth-First Search AI,0.5422084331512451,1209.03,16,leveleasiest
+Greedy Maximize Empty AI,1.66603422164917,4200.23,10,leveleasy
