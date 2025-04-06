@@ -9,15 +9,36 @@ os.makedirs("analysis")
 
 df = pd.read_csv("test_results.csv")
 
-df_clean = df.dropna(subset=["Time", "Memory", "Score", "Steps"])
+# Create a copy instead of a view to avoid SettingWithCopyWarning
+df_clean = df.dropna(subset=["Time", "Memory", "Score", "Steps"]).copy()
 
-# Convert Memory from bytes to MB
-df_clean["Memory"] = df_clean["Memory"].astype(float) / (1024 * 1024)
 
-df_clean["Level"] = df_clean["Level"].str.replace("./levels/", "", regex=False).str.replace(".txt", "", regex=False)
+df_clean.loc[:, "Memory"] = df_clean["Memory"].astype(float) / (1024 * 1024)
+
+df_clean.loc[:, "Level"] = df_clean["Level"].str.replace("./levels/", "", regex=False).str.replace(".txt", "", regex=False)
+
+df_clean = df_clean.copy()  
+
+a_star_mask = df_clean["Algorithm"].str.contains("a_star", na=False)
+
+def process_a_star(row):
+    if "a_star" in str(row["Algorithm"]):
+        weight = float(row.get("Weight", 1.0))
+        if weight == 1.0:
+            return row["Algorithm"] 
+        elif weight == 1.5:
+
+            return "weighted_" + row["Algorithm"]
+        else:
+            return None
+    return row["Algorithm"]
+df_clean["Algorithm"] = df_clean.apply(process_a_star, axis=1)
+df_clean = df_clean[df_clean["Algorithm"].notna()]
+print(df_clean)
 uninformed_algorithms = ["depth_first", "breadth_first", "iterative_deepening"]
 df_uninformed = df_clean[df_clean["Algorithm"].isin(uninformed_algorithms)]
 df_informed = df_clean[~df_clean["Algorithm"].isin(uninformed_algorithms)]
+
 def plot_metrics(metric: str, ylabel: str, base_filename: str):
     for df_group, group_name, cmap in [
         (df_uninformed, "Uninformed", "Blues"),
@@ -36,12 +57,13 @@ def plot_metrics(metric: str, ylabel: str, base_filename: str):
         ax.grid(axis='y', linestyle="--", alpha=0.7)
         ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
         
-
         if metric == "Steps":
             import matplotlib.ticker as ticker
             ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
             
-        ax.legend(title="Level")
+        # Position legend in top right corner
+        ax.legend(title="Level", loc='upper right')
+        
         plt.tight_layout()
         plt.savefig(os.path.join("analysis", f"{group_name.lower()}_{base_filename}"))
         plt.close()
