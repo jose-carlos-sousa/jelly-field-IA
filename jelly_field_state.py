@@ -4,7 +4,8 @@ import pandas as pd
 from collections import deque
 import ai
 
-#For convertion E means empty space, N means Non playable space
+# InfiniteArray class
+# Simulates an infinite array of the next jellies array repeating
 class InfiniteArray:
     def __init__(self, arr):
         self.arr = arr.copy()
@@ -14,10 +15,13 @@ class InfiniteArray:
         self.cur.append(value)
         self.arr.append(copy.deepcopy(value))
         
+    # when a jelly is popped, it is checked if it is the second to last jelly
+    # if it is we add to the array with the last jelly a repeated copy of the original next jellies
+    # the reason why it is the second to last is because at a given time there are always at least two jellies in the next jellies array
     def pop(self, index=-1):
         self.cur.pop(index)
         if len(self.cur) <= 1:
-            if(index == 1):
+            if(index == 1): 
                 self.cur = self.cur + self.arr.copy()
             else:
                 self.cur = [self.arr.copy()[0]] + self.cur + self.arr.copy()[1:]
@@ -28,7 +32,11 @@ class InfiniteArray:
     def __len__(self):
         return len(self.cur)
         
-    
+        
+# Jelly class
+# Represents a 2x2 jelly piece
+# Each jelly can be normal, empty, or not applicable (na)
+# The jelly can be expanded to fill adjacent empty spaces
 class Jelly:
     def __init__(self, array, type = "normal"):
         if len(array) != 2 or any(len(row) != 2 for row in array):
@@ -191,6 +199,9 @@ class JellyFieldState:
 
         self.collapseCount = 0
 
+    # Check for collision between two jellies
+    # Returns a list of colors that are the same in both jellies
+    # If no colors match, returns None
     def checkCollision(self, jelly1, jelly2, direction):
         if jelly1.type == "na" or jelly2.type == "na":
             return None
@@ -214,6 +225,9 @@ class JellyFieldState:
 
         return collisionColors if collisionColors else None
 
+    
+    # Collapse the board
+    # Check for collisions and update the board accordingly until no more changes occur
     def collapse(self):
         changes = True
         while changes:
@@ -248,7 +262,7 @@ class JellyFieldState:
                             self.goal[color] = max(self.goal[color] - 1, 0)
                         self.board[i][j].expand(self)
         
-                                
+    # Move a jelly to a new position                   
     def move(self, seqNum, x, y):
         if ((self.board[y][x].type == "empty") and (seqNum == 0 or seqNum == 1)):
             self.board[y][x] = self.next_jellies[seqNum]
@@ -270,6 +284,7 @@ class JellyFieldState:
 
     def __str__(self):
         return f"Colors {self.colors} Board: {self.board}, Next Jellies: {self.next_jellies}, Goal: {self.goal}"
+    
     def printBoard(self):
         for row in self.board:
             for i in range(2):
@@ -301,9 +316,10 @@ class JellyFieldState:
                     return False
         return True
     
+    # Used in hints to determine the next best move
     def get_next_best_move(self):
         aiAgent = ai.AIAgent(self)
-        node = aiAgent.a_star_search(aiAgent.heuristic_goal_vals, 1)
+        node = aiAgent.a_star_search(aiAgent.heuristic_collapse_count, 1.5)
 
         move = None
 

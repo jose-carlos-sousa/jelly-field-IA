@@ -7,6 +7,7 @@ class AIGame(Screen):
         super().__init__()
         self.gajo = ai.AIAgent(state)
         self.add_text_button("Return To Main Menu", "large_bold", (self.width // 2, self.height - 100))
+        self.display_calculation()
         self.stats = self.run_game(state) 
 
     def run_game(self, state):
@@ -39,7 +40,11 @@ class AIGame(Screen):
     def save_game(self, stats):
         with open('leaderboard.csv', 'a') as file:
             file.write(f"{stats['player']},{stats['time']},{stats['score']},{stats['steps']},{stats['level']}\n")
-
+   
+    def display_calculation(self):
+        self.surface.blit(self.bg, (0, 0))
+        self.draw_text("Calculating...", "large_bold", (self.width // 2, self.height // 2))
+        pygame.display.flip()
     def display(self, state):
         self.surface.blit(self.bg, (0, 0))
         self.draw_text("Game Stats", "large_bold", (self.width // 2, 50))

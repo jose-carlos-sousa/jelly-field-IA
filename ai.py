@@ -23,6 +23,7 @@ class TreeNode:
     def __lt__(self, other):
         return False  # or any other logic to compare TreeNode instances
 
+# This class represents the AI agent that will perform the search
 class AIAgent:
     def __init__(self, state):
         self.initial_state = state
@@ -32,6 +33,7 @@ class AIAgent:
     def goal_state(self, state):
         return all(value == 0 for value in state.goal.values())
 
+    # This function generates a dictionary of child states and the moves that lead to them
     def get_child_states(self, state):
         stateDict = {}
         rows, cols = len(state.board), len(state.board[0])
@@ -45,6 +47,7 @@ class AIAgent:
                         stateDict[(row, col, seqNum)] = jellyState
 
         return stateDict
+    
     
     def depth_first_search(self):
         tracemalloc.start()
@@ -109,13 +112,11 @@ class AIAgent:
         depth = 1
         while depth < max_depth:
             node = TreeNode(self.initial_state)
-            print(f"initiating depth {node.depth}")
             stack = [node]
             visited = [node]
 
             while stack:
                 node = stack.pop()
-                print(f"Depth {node.depth}")
                 if self.goal_state(node.state):
                     self.time = time.time() - start
                     _, peak = tracemalloc.get_traced_memory()
@@ -196,12 +197,14 @@ class AIAgent:
             visited.add(node.state)
             best_child = None
             best_heuristic = float('inf')
-            for state in self.get_child_states(node.state):
+            for moveArr, state in self.get_child_states(node.state).items():
                 if state not in visited:
                     h_value = heuristic(state)
                     if h_value < best_heuristic:
                         best_heuristic = h_value
                         best_child = TreeNode(state)
+                        best_child.add_move(moveArr)
+                        node.add_child(best_child)
             
             if best_child:
                 node.add_child(best_child)
