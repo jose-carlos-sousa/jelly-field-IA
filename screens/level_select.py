@@ -34,7 +34,7 @@ class LevelSelect(Screen):
                         if button_text == "Previous":
                             self.selected = (self.selected - 1) % len(self.levels)
                         elif button_text == "Next":
-                            self.selected = (self.selected - 1) % len(self.levels)
+                            self.selected = (self.selected + 1) % len(self.levels)
                         elif button_text == "Main Menu":
                             return "main_menu", state
                         elif button_text == "Select":

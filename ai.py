@@ -109,13 +109,11 @@ class AIAgent:
         depth = 1
         while depth < max_depth:
             node = TreeNode(self.initial_state)
-            print(f"initiating depth {node.depth}")
             stack = [node]
             visited = [node]
 
             while stack:
                 node = stack.pop()
-                print(f"Depth {node.depth}")
                 if self.goal_state(node.state):
                     self.time = time.time() - start
                     _, peak = tracemalloc.get_traced_memory()
@@ -129,7 +127,6 @@ class AIAgent:
                         new_state.add_move(moveArr)
                         node.add_child(new_state)
                         stack.append(new_state)
-            print(f"Depth {depth} failed")
             depth += 1
 
         self.time = time.time() - start
