@@ -21,6 +21,8 @@ def run_test(algorithm, level, weight):
             solution = myagent.depth_first_search()
         elif(algorithm == 'breadth_first'):
             solution = myagent.bfs_search()
+        elif(algorithm == 'iterative_deepening'):
+            solution = myagent.iterative_deepening()
         elif(algorithm == 'greedy_maximize_empty'):
             solution = myagent.greedy_search(myagent.heuristic_non_empty_jellies)
         elif(algorithm == 'greedy_minimize_goal'):
@@ -51,10 +53,12 @@ def run_test(algorithm, level, weight):
         return None
         
 def run_tests():
-    levels = ['leveleasiest', 'leveleasy', 'levelmedium', 'levelhard', 'levelhardest']
+    levels = ['leveltest', 'leveltest2','leveleasiest', 'leveleasy', 'levelmedium', 'levelhard', 'levelhardest']
     levels = [os.path.join('.', 'levels', f'{level}.txt') for level in levels]
-    algorithms = ['depth_first', 'breadth_first', 'greedy_maximize_empty', 'greedy_minimize_goal','greedy_collapse_count', 'a_star_maximize_empty', 'a_star_minimize_goal', 'a_star_collapse_count']
+    algorithms = ['depth_first', 'breadth_first','iterative_deepening', 'greedy_maximize_empty', 'greedy_minimize_goal','greedy_collapse_count', 'a_star_maximize_empty', 'a_star_minimize_goal', 'a_star_collapse_count']
     weight_vals = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+    with open('test_results.csv', 'w') as file:
+        file.write("Algorithm,Level,Weight,Time,Memory,Score,Steps\n")
     for level in levels:
         for algorithm in algorithms:
             if(algorithm == 'depth_first'):
@@ -62,6 +66,9 @@ def run_tests():
                 write_to_csv(algorithm, level, solution)
             elif(algorithm == 'breadth_first'):
                 solution =  run_test(algorithm, level, None)
+                write_to_csv(algorithm, level, solution)
+            elif(algorithm == 'iterative_deepening'):
+                solution = run_test(algorithm, level, None)
                 write_to_csv(algorithm, level, solution)
             elif(algorithm == 'greedy_maximize_empty'):
                 solution = run_test(algorithm, level, None)
@@ -75,20 +82,20 @@ def run_tests():
             elif(algorithm == 'a_star_maximize_empty'):
                 for weight in weight_vals:
                     solution = run_test(algorithm, level, weight)
-                    write_to_csv(algorithm, level, solution)
+                    write_to_csv(algorithm, level, solution, weight)
             elif(algorithm == 'a_star_minimize_goal'):
                 for weight in weight_vals:
                     solution = run_test(algorithm, level, weight)
-                    write_to_csv(algorithm, level, solution)
+                    write_to_csv(algorithm, level, solution, weight)
             elif(algorithm == 'a_star_collapse_count'):
                 for weight in weight_vals:
                     solution = run_test(algorithm, level, weight)
-                    write_to_csv(algorithm, level, solution)
+                    write_to_csv(algorithm, level, solution, weight)
                     
-def write_to_csv(algorithm, level, solution):
+def write_to_csv(algorithm, level, solution, weight=None):
     with open('test_results.csv', 'a') as file:
         if solution:
-            file.write(f"{algorithm},{level},{solution.state.stats['time']},{solution.state.stats['memory']},{solution.state.stats['score']},{solution.state.stats['steps']}\n")
+            file.write(f"{algorithm},{level},{weight},{solution.state.stats['time']},{solution.state.stats['memory']},{solution.state.stats['score']},{solution.state.stats['steps']}\n")
         else:
-            file.write(f"{algorithm},{level},None,None,None,None\n")
+            file.write(f"{algorithm},{level},{weight},None,None,None,None\n")
 run_tests()

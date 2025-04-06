@@ -1,0 +1,20 @@
+Score: 2683.61
+Steps: 16
+Time: 2.25895 seconds
+Memory: 2912680 bytes
+Move: left piece moved to (4, 3)
+Move: right piece moved to (1, 4)
+Move: right piece moved to (4, 2)
+Move: right piece moved to (4, 4)
+Move: right piece moved to (6, 5)
+Move: right piece moved to (2, 0)
+Move: right piece moved to (1, 0)
+Move: left piece moved to (2, 3)
+Move: left piece moved to (2, 5)
+Move: left piece moved to (0, 2)
+Move: right piece moved to (6, 5)
+Move: left piece moved to (0, 0)
+Move: left piece moved to (0, 1)
+Move: right piece moved to (1, 2)
+Move: left piece moved to (0, 4)
+Move: right piece moved to (5, 2)

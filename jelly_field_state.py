@@ -120,7 +120,6 @@ class JellyFieldState:
             self.colors = {}
             self.nonEmptyJellyCount = 0
             self.collapseCount = 0
-            self.nextBestMove = None
         self.stats = {'time': 0, 'steps': 0, 'level': "", 'player': "", 'score': 0, 'memory': 0}
         self.player = None
                         
@@ -191,7 +190,6 @@ class JellyFieldState:
                     self.nonEmptyJellyCount += 1
 
         self.collapseCount = 0
-        self.nextBestMove = None
 
     def checkCollision(self, jelly1, jelly2, direction):
         if jelly1.type == "na" or jelly2.type == "na":
@@ -303,7 +301,7 @@ class JellyFieldState:
                     return False
         return True
     
-    def load_next_best_move(self):
+    def get_next_best_move(self):
         aiAgent = ai.AIAgent(self)
         node = aiAgent.a_star_search(aiAgent.heuristic_collapse_count, 1.5)
 
@@ -312,10 +310,4 @@ class JellyFieldState:
         while node.parent:
             move = node.move
             node = node.parent
-        self.nextBestMove = move
-
-    def get_next_best_move(self):
-        if self.nextBestMove is None:
-            print("Calculating next best move...")
-            self.load_next_best_move()
-        return self.nextBestMove
+        return move
