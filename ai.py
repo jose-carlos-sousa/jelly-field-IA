@@ -130,7 +130,6 @@ class AIAgent:
                         new_state.add_move(moveArr)
                         node.add_child(new_state)
                         stack.append(new_state)
-            print(f"Depth {depth} failed")
             depth += 1
 
         self.time = time.time() - start
@@ -222,8 +221,6 @@ class AIAgent:
         if (not node):
             return None
         player = node.state.player
-        print(f"Player: {player}")
-        print(f"stats: {node.state.stats}")
         level = node.state.stats['level']
         cur_timestamp = time.strftime("%d_%m_%Y_%H_%M_%S")
         file_name = f"solution_{player}_{level}_{cur_timestamp}.txt"

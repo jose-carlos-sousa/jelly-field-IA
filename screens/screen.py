@@ -70,7 +70,7 @@ class Screen(ABC):
             text_rect = font_text.get_rect(topright=position)
             
         self.buttons[text] = text_rect
-    
+            
     @abstractmethod
     def display(self, state):
         pass

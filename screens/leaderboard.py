@@ -13,7 +13,7 @@ class Leaderboard(Screen):
         self.draw_button("Main Menu", "medium_bold", (50, 50), alignment="left")
 
         self.draw_text("Player", "medium_bold", (100, 135), alignment="left")
-        self.draw_text("Level", "medium_bold", (self.width - 550, 150))
+        self.draw_text("Level", "medium_bold", (self.width - 600, 150))
         self.draw_text("Time", "medium_bold", (self.width - 400, 150))
         self.draw_text("Moves", "medium_bold", (self.width - 250, 150))
         self.draw_text("Score", "medium_bold", (self.width - 100, 150))
@@ -23,7 +23,7 @@ class Leaderboard(Screen):
 
         for index, row in self.leaderboard.iterrows():
             self.draw_text(f"{pos}. {row['Player']}", "medium_bold", (100, y_offset - 15), alignment="left")
-            self.draw_text(f"{row['Level']}", "medium", (self.width - 550, y_offset))
+            self.draw_text(f"{row['Level']}", "medium", (self.width - 600, y_offset))
             self.draw_text(f"{row['Time']:.2f} s", "medium", (self.width - 400, y_offset))
             self.draw_text(f"{row['Moves']}", "medium", (self.width - 250, y_offset))
             self.draw_text(f"{row['Score']}", "medium", (self.width - 100, y_offset))

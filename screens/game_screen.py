@@ -39,6 +39,16 @@ class GameScreen(Screen):
                             board_y + row * self.cell_size + square_height * square_row, square_width, square_height)
                             pygame.draw.rect(self.surface, cell_color, cell_rect)
                             pygame.draw.rect(self.surface, (255, 255, 255), cell_rect, 2)
+        
+        for row in range(rows):
+            label = self.fonts['small'].render(str(row), True, (255, 255, 255))
+            label_pos = (board_x - 20, board_y + row * self.cell_size + self.cell_size // 2 - label.get_height() // 2)
+            self.surface.blit(label, label_pos)
+
+        for col in range(cols):
+            label = self.fonts['small'].render(str(col), True, (255, 255, 255))
+            label_pos = (board_x + col * self.cell_size + self.cell_size // 2 - label.get_width() // 2, board_y - 20)
+            self.surface.blit(label, label_pos)
 
     def draw_goals(self, state):
         goals = len(state.goal)
