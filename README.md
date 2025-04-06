@@ -48,14 +48,13 @@ No space left to place a piece (board filled)
 ### Operators
 1. **Place First Jelly**: Position at (X,Y) if empty and within map boundaries
 2. **Place Second Jelly**: Position at (X,Y) if empty and within map boundaries
-3. **Hammer Move**: Remove jelly at (X,Y) if occupied and within map boundaries
 
 ### State Update Rules
 1. After placing a new jelly, all neighboring jellies of the same color are deleted and the placed jelly expands
 2. Chain reactions may occur when expansions cause additional matches
 
 ### Scoring
-Performance is measured by the number of moves required to win the game
+Performance is evaluated based on the number of moves required to win the game and the time taken to achieve victory
 
 ## Screenshots
 
