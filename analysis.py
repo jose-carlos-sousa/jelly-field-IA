@@ -34,7 +34,6 @@ def process_a_star(row):
     return row["Algorithm"]
 df_clean["Algorithm"] = df_clean.apply(process_a_star, axis=1)
 df_clean = df_clean[df_clean["Algorithm"].notna()]
-print(df_clean)
 uninformed_algorithms = ["depth_first", "breadth_first", "iterative_deepening"]
 df_uninformed = df_clean[df_clean["Algorithm"].isin(uninformed_algorithms)]
 df_informed = df_clean[~df_clean["Algorithm"].isin(uninformed_algorithms)]
