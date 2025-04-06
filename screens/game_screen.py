@@ -64,6 +64,7 @@ class GameScreen(Screen):
                     pygame.draw.rect(self.surface, cell_color, cell_rect)
                     pygame.draw.rect(self.surface, (255, 255, 255), cell_rect, 2)
 
+    # Draws a hint line arrow from the jelly chosen to the target Jelly
     def draw_hint(self, state):
         move = state.get_next_best_move()
         if move:
@@ -142,12 +143,12 @@ class GameScreen(Screen):
                         if button_text == "Main Menu":
                             return "main_menu", state
                         if button_text == "Get Hint":
-                            self.hint_button_pressed = not self.hint_button_pressed
+                            self.hint_button_pressed = not self.hint_button_pressed # Toggle the hint button state
                             self.display(state)
                             self.show_hint = not self.show_hint
                             self.display(state)
                             start_time = time.time()
-                            while time.time() - start_time < 1:
+                            while time.time() - start_time < 1: 
                                 self.display(state)
                                 pygame.time.delay(10) 
                                 for e in pygame.event.get():

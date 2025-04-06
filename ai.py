@@ -23,6 +23,7 @@ class TreeNode:
     def __lt__(self, other):
         return False  # or any other logic to compare TreeNode instances
 
+# This class represents the AI agent that will perform the search
 class AIAgent:
     def __init__(self, state):
         self.initial_state = state
@@ -32,6 +33,7 @@ class AIAgent:
     def goal_state(self, state):
         return all(value == 0 for value in state.goal.values())
 
+    # This function generates a dictionary of child states and the moves that lead to them
     def get_child_states(self, state):
         stateDict = {}
         rows, cols = len(state.board), len(state.board[0])
@@ -45,6 +47,7 @@ class AIAgent:
                         stateDict[(row, col, seqNum)] = jellyState
 
         return stateDict
+    
     
     def depth_first_search(self):
         tracemalloc.start()

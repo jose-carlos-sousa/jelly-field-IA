@@ -43,3 +43,11 @@ A* Minimize Goal AI,1.4168751239776611,1699.08,8,leveltest2
 A* Minimize Goal AI,23.57738995552063,1303.98,14,levelhardest
 A* Minimize Goal AI,1.4718608856201172,1689.21,8,leveltest2
 A* Maximize Collapse AI,7.878562688827515,2141.74,15,levelhardest
+A* Maximize Empty AI,3.0655248165130615,1589.58,7,leveltest2
+A* Minimize Goal AI,0.38710570335388184,1704.47,9,levelhard
+A* Maximize Collapse AI,7.9389965534210205,2136.1,15,levelhardest
+Depth-First Search AI,2.8413710594177246,1406.37,32,levelhardest
+Human,20.59298586845398,2379.45,5,leveleasy
+Human,57.67403769493103,277.42,14,levelhard
+A* Maximize Collapse AI,7.936873197555542,2136.3,15,levelhardest
+Depth-First Search AI,0.3441305160522461,872.21,18,leveltest2

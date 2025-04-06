@@ -19,7 +19,7 @@ class EventHandler:
         df.set_index('Player')
         df.sort_values('Score', ascending=False, inplace=True)
         return df.head(10)
-
+    
     def save_game(self, steps, solution_time, score, player, level):
         with open('leaderboard.csv', 'a') as file:
             file.write(f"{player},{solution_time},{score},{steps},{level}\n")
@@ -34,6 +34,10 @@ class EventHandler:
         pygame.quit()
         exit()
 
+    # This function handles events and updates the state of the game
+    # based on the events that occur.
+    # It checks for events like quitting the game, mouse clicks, etc.
+    # If no events are found, it returns the current state.
     def handle_events(self, state):
         if(not pygame.event.peek()):
             return state
